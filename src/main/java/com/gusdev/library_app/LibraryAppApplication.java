@@ -18,20 +18,6 @@ public class LibraryAppApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(LibraryAppApplication.class, args);
 	}
-
-	@Bean
-	public CommandLineRunner demo(UserRepository userRepository) {
-		return (args -> {
-			User user= new User();
-			user.setName("Gustavo");
-			user.setSurname("Starace");
-			user.setEmail("practicodecocina@gmail.com");
-			user.setIsAdmin(true);
-
-			userRepository.save(user);
-			System.out.println("Usuario guardado " + user);
-					});
-	}
 }
 
 

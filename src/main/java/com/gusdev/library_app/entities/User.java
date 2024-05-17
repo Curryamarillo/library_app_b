@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -25,4 +28,7 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isAdmin = false;
+
+    @OneToMany(mappedBy = "user")
+    private Set<Loan> loans = new HashSet<>();
 }
