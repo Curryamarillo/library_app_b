@@ -6,4 +6,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
+
+    boolean existsByTitle(String name);
+
+    Iterable<Book> findByTitleIgnoreCase(String title);
+
+    Iterable<Book> findByAuthorIgnoreCase(String author);
 }

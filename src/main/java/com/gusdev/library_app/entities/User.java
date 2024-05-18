@@ -10,7 +10,7 @@ import java.util.Set;
 @Data
 @Entity
 @NoArgsConstructor
-@Table(name = "employees")
+@Table(name = "users")
 public class User {
 
     @Id
@@ -28,6 +28,9 @@ public class User {
 
     @Column(nullable = false)
     private Boolean isAdmin = false;
+
+    @Column(nullable = false, length = 100)
+    private String password;
 
     @OneToMany(mappedBy = "user")
     private Set<Loan> loans = new HashSet<>();
