@@ -41,9 +41,8 @@ public class UserService {
     }
 
     public UserDTO findById(Long id) {
-        User user = userRepository.findById(id).orElse(null);
-        return user != null ? modelMapper.map(user, UserDTO.class) : null;
-
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return modelMapper.map(user, UserDTO.class);
     }
 
     public void update(Long id, User user) {
@@ -52,6 +51,7 @@ public class UserService {
             existsUser.setName(user.getName());
             existsUser.setSurname(user.getSurname());
             existsUser.setEmail(user.getEmail());
+            existsUser.setIsAdmin(user.getIsAdmin());
             existsUser.setPassword(user.getPassword());
             userRepository.save(existsUser);
         } else {
@@ -65,5 +65,8 @@ public class UserService {
 
          */
         userRepository.delete(user);
+    }
+    public UserDTO convertToDTO(User user) {
+        return modelMapper.map(user, UserDTO.class);
     }
 }

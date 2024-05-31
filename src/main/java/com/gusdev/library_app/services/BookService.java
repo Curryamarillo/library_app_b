@@ -1,5 +1,6 @@
 package com.gusdev.library_app.services;
 
+import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
@@ -31,18 +32,25 @@ public class BookService {
         return bookRepository.findAll();
     }
     public Iterable<Book> findByTitleIgnoreCase(String title) {
-        return bookRepository.findByTitleIgnoreCase(title);
+        Iterable<Book> books = bookRepository.findByTitleIgnoreCase(title);
+        if (!books.iterator().hasNext()) {
+            throw new BookNotFoundException("Books not found by title");
+        }        return books;
     }
 
     public Iterable<Book> findByAuthorIgnoreCase(String author) {
-        return bookRepository.findByAuthorIgnoreCase(author);
+        Iterable<Book> books = bookRepository.findByAuthorIgnoreCase(author);
+        if (!books.iterator().hasNext()) {
+            throw new BookNotFoundException("Books not found by author");
+        }
+        return books;
     }
 
     public Book findById(Long id) {
         return bookRepository.findById(id).orElse(null);
     }
 
-    public void update(Long id, Book book) {
+    public void update(Long id, BookDTO book) {
         Book existsBook = bookRepository.findById(id).orElse(null);
         if (existsBook != null) {
             existsBook.setAuthor(book.getAuthor());

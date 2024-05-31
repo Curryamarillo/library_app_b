@@ -29,4 +29,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBookNotFoundException(BookNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(LoanAlreadyExistsException.class)
+    public ResponseEntity<String> handleLoanAlreadyExistsException(LoanAlreadyExistsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
 }

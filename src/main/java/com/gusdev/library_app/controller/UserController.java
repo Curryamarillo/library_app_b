@@ -21,9 +21,10 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
         User createdUser = userService.create(user);
-        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+        UserDTO createdUserDTO = userService.convertToDTO(createdUser);
+        return new ResponseEntity<>(createdUserDTO, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -43,7 +44,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> update(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
             userService.update(id, user);
             UserDTO updatedUser = userService.findById(id);
@@ -52,7 +53,7 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
