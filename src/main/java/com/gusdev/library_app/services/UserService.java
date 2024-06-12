@@ -7,9 +7,6 @@ import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service

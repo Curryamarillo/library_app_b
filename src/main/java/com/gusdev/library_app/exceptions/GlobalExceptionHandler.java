@@ -31,6 +31,10 @@ public class GlobalExceptionHandler {
     }
     @ExceptionHandler(LoanAlreadyExistsException.class)
     public ResponseEntity<String> handleLoanAlreadyExistsException(LoanAlreadyExistsException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler(LoanNotFoundException.class)
+    public ResponseEntity<String> handleLoanNotFoundException(LoanNotFoundException e) {
         return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }

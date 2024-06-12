@@ -7,8 +7,6 @@ import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 @Service
 public class BookService {

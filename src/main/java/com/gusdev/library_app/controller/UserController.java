@@ -36,8 +36,8 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         try {
-            UserDTO user = userService.findById(id);
-            return ResponseEntity.ok(user);
+            UserDTO userDTO = userService.findById(id);
+            return ResponseEntity.ok(userDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }

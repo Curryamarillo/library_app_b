@@ -40,10 +40,14 @@ public class LoanService {
         }
         return loanDTOList;
     }
-    public Loan findById(Long id) {
-        return loanRepository.findById(id).orElseThrow(() -> new LoanAlreadyExistsException("Book not found"));
+    public LoanDTO findById(Long id) {
+        Loan loan = loanRepository.findById(id).orElseThrow(() -> new LoanAlreadyExistsException("Book not found"));
+        return modelMapper.map(loan, LoanDTO.class);
     }
     public void deleteById(Long id) {
         loanRepository.deleteById(id);
+    }
+    public LoanDTO convertToDTO(Loan loan) {
+        return modelMapper.map(loan, LoanDTO.class);
     }
 }
