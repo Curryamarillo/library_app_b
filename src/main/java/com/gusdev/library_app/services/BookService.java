@@ -5,7 +5,9 @@ import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+
 
 
 @Service
@@ -13,6 +15,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
 
+    private ModelMapper modelMapper;
 
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
@@ -29,6 +32,7 @@ public class BookService {
     public Iterable<Book> findAll() {
         return bookRepository.findAll();
     }
+
     public Iterable<Book> findByTitleIgnoreCase(String title) {
         Iterable<Book> books = bookRepository.findByTitleIgnoreCase(title);
         if (!books.iterator().hasNext()) {
@@ -62,4 +66,6 @@ public class BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id).orElse(null);
     }
+
+    public BookDTO convertToDTO(Book book) { return modelMapper.map(book, BookDTO.class);}
 }
