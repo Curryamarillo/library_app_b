@@ -59,7 +59,7 @@ class BookServiceTest {
                 .build();
     }
     @Test
-    void createBook() {
+    void createBookTest() {
         // given
         given(bookRepository.existsByTitle(book1.getTitle())).willReturn(false);
         given(bookRepository.save(book1)).willReturn(book1);
@@ -75,7 +75,7 @@ class BookServiceTest {
     }
 
     @Test
-    void createBookAlreadyExists() {
+    void createBookAlreadyExistsTest() {
         // given
         given(bookRepository.existsByTitle(book1.getTitle())).willReturn(true);
 
@@ -86,7 +86,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findAllBooks() {
+    void findAllBooksTest() {
         // given
         List<Book> books = Collections.singletonList(book1);
         given(bookRepository.findAll()).willReturn(books);
@@ -102,7 +102,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findByTitleIgnoreCase() {
+    void findByTitleIgnoreCaseTest() {
         // given
         String title = "Book One";
         given(bookRepository.findByTitleIgnoreCase(title)).willReturn(Collections.singletonList(book1));
@@ -118,7 +118,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findByTitleIgnoreCaseNotFound() {
+    void findByTitleIgnoreCaseNotFoundTest() {
         // given
         String title = "Non-existent Book";
         given(bookRepository.findByTitleIgnoreCase(title)).willReturn(Collections.emptyList());
@@ -129,7 +129,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findByAuthorIgnoreCase() {
+    void findByAuthorIgnoreCaseTest() {
         // given
         String author = "Author One";
         given(bookRepository.findByAuthorIgnoreCase(author)).willReturn(Collections.singletonList(book1));
@@ -145,7 +145,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findByAuthorIgnoreCaseNotFound() {
+    void findByAuthorIgnoreCaseNotFoundTest() {
         // given
         String author = "Non-existent Author";
         given(bookRepository.findByAuthorIgnoreCase(author)).willReturn(Collections.emptyList());
@@ -156,7 +156,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findById() {
+    void findByIdTest() {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
@@ -170,7 +170,7 @@ class BookServiceTest {
     }
 
     @Test
-    void findByIdNotFound() {
+    void findByIdNotFoundTest() {
         // given
         Long nonExistingId = 999L;
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
@@ -184,7 +184,7 @@ class BookServiceTest {
     }
 
     @Test
-    void updateBook() {
+    void updateBookTest() {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
@@ -198,7 +198,7 @@ class BookServiceTest {
     }
 
     @Test
-    void updateBookNotFound() {
+    void updateBookNotFoundTest() {
         // given
         Long nonExistingId = 999L;
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
@@ -210,7 +210,7 @@ class BookServiceTest {
     }
 
     @Test
-    void deleteBook() {
+    void deleteBookTest() {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
@@ -223,7 +223,7 @@ class BookServiceTest {
     }
 
     @Test
-    void deleteBookNotFound() {
+    void deleteBookNotFoundTest() {
         // given
         Long nonExistingId = 999L;
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
@@ -235,7 +235,7 @@ class BookServiceTest {
     }
 
     @Test
-    void convertToDTO() {
+    void convertToDTOTest() {
         // given
         given(modelMapper.map(book1, BookDTO.class)).willReturn(bookDTO1);
 

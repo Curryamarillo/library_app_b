@@ -3,13 +3,14 @@ package com.gusdev.library_app.services;
 import com.gusdev.library_app.dtoResponse.LoanDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
+import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+
 
 @Service
 public class LoanService {
@@ -40,7 +41,7 @@ public class LoanService {
         return loanDTOList;
     }
     public LoanDTO findById(Long id) {
-        Loan loan = loanRepository.findById(id).orElseThrow(() -> new LoanAlreadyExistsException("Book not found"));
+        Loan loan = loanRepository.findById(id).orElseThrow(() -> new LoanNotFoundException("Book not found"));
         return modelMapper.map(loan, LoanDTO.class);
     }
     public void deleteById(Long id) {

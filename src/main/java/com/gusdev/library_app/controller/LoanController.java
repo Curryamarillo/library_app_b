@@ -61,6 +61,7 @@ public class LoanController {
             return ResponseEntity.notFound().build();
         }
     }
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         loanService.deleteById(id);
         return ResponseEntity.noContent().build();

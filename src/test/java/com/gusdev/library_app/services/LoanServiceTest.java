@@ -5,6 +5,7 @@ import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
+import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -129,7 +130,7 @@ class LoanServiceTest {
         given(loanRepository.findById(anyLong())).willReturn(Optional.empty());
 
 
-        assertThrows(LoanAlreadyExistsException.class, () -> loanService.findById(1L));
+        assertThrows(LoanNotFoundException.class, () -> loanService.findById(4L));
     }
 
     @Test
