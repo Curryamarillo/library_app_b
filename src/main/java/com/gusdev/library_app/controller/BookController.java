@@ -4,14 +4,12 @@ import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.services.BookService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -19,12 +17,10 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final ModelMapper modelMapper;
 
     @Autowired
-    public BookController(BookService bookService, ModelMapper modelMapper) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
-        this.modelMapper = modelMapper;
     }
 
     @PostMapping("/create")
@@ -34,36 +30,36 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<BookDTO>> findAll() {
-        Iterable<Book> bookList = bookService.findAll();
-
-        List<BookDTO> bookDTOList = new ArrayList<>();
-        for (Book book : bookList) {
-            bookDTOList.add(modelMapper.map(book, BookDTO.class));
-        }
-
+    public ResponseEntity<List<BookDTO>> findAll() {
+        List<Book> bookList = bookService.findAll();
+        List<BookDTO> bookDTOList = bookList.stream()
+                .map(bookService::convertToDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(bookDTOList);
     }
-    @GetMapping("/{title}")
-    public ResponseEntity<Iterable<Book>> findByTitle(@PathVariable String title) {
-        try {
-            Iterable<Book> books = bookService.findByTitleIgnoreCase(title);
-            return ResponseEntity.ok(books);
-        } catch (BookNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("Error occurred while searching for books", e);
-        }
-    }
-    @GetMapping("/author/{author}")
-    public ResponseEntity<Iterable<Book>> findByAuthor(@PathVariable String author) {
-        Iterable<Book> books = bookService.findByAuthorIgnoreCase(author);
+
+    @GetMapping("/title/{title}")
+    public ResponseEntity<List<Book>> findByTitle(@PathVariable String title) {
+        List<Book> books = bookService.findByTitleIgnoreCase(title);
         return ResponseEntity.ok(books);
     }
-    @PutMapping()
-    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookDTO book) {
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> findById(@PathVariable Long id) {
+        Book book = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        return ResponseEntity.ok(book);
+    }
+
+    @GetMapping("/author/{author}")
+    public ResponseEntity<List<Book>> findByAuthor(@PathVariable String author) {
+        List<Book> books = bookService.findByAuthorIgnoreCase(author);
+        return ResponseEntity.ok(books);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
         try {
-            bookService.update(id, book);
+            bookService.update(id, bookDTO);
             return ResponseEntity.ok().build();
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

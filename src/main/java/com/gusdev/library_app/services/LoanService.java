@@ -24,12 +24,11 @@ public class LoanService {
     }
 
     public Loan create(Loan loan) {
-        Optional<Loan> loanAvailable = loanRepository.findFirstByBookIdAndReturnDateIsNullOrderByLoanDateDesc(loan.getBook().getId());
-    if (loanAvailable.isPresent()) {
-        throw new LoanAlreadyExistsException("The book is not here");
-    } else {
+        if(!loan.getBook().getIsAvailable()) {
+            throw new LoanAlreadyExistsException("The book is not available for loan");
+        }
+        loan.getBook().setIsAvailable(false);
         return loanRepository.save(loan);
-    }
     }
     public List<LoanDTO> findAll() {
         Iterable<Loan> loans = loanRepository.findAll();

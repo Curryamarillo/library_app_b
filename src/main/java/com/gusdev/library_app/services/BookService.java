@@ -6,19 +6,23 @@ import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 
 
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final ModelMapper modelMapper;
 
-    private ModelMapper modelMapper;
-
-    public BookService(BookRepository bookRepository) {
+    @Autowired
+    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
+        this.modelMapper = modelMapper;
     }
 
     public Book create(Book book) {
@@ -29,43 +33,44 @@ public class BookService {
         return bookRepository.save(book);
     }
 
-    public Iterable<Book> findAll() {
+    public List<Book> findAll() {
         return bookRepository.findAll();
     }
 
-    public Iterable<Book> findByTitleIgnoreCase(String title) {
-        Iterable<Book> books = bookRepository.findByTitleIgnoreCase(title);
-        if (!books.iterator().hasNext()) {
+    public List<Book> findByTitleIgnoreCase(String title) {
+        List<Book> books = bookRepository.findByTitleIgnoreCase(title);
+        if (books.isEmpty()) {
             throw new BookNotFoundException("Books not found by title");
-        }        return books;
+        }
+        return books;
     }
 
-    public Iterable<Book> findByAuthorIgnoreCase(String author) {
-        Iterable<Book> books = bookRepository.findByAuthorIgnoreCase(author);
-        if (!books.iterator().hasNext()) {
+    public List<Book> findByAuthorIgnoreCase(String author) {
+        List<Book> books = bookRepository.findByAuthorIgnoreCase(author);
+        if (books.isEmpty()) {
             throw new BookNotFoundException("Books not found by author");
         }
         return books;
     }
 
-    public Book findById(Long id) {
-        return bookRepository.findById(id).orElse(null);
+    public Optional<Book> findById(Long id) {
+        return bookRepository.findById(id);
     }
 
-    public void update(Long id, BookDTO book) {
-        Book existsBook = bookRepository.findById(id).orElse(null);
-        if (existsBook != null) {
-            existsBook.setAuthor(book.getAuthor());
-            existsBook.setIsbn(book.getIsbn());
-            existsBook.setTitle(book.getTitle());
-            bookRepository.save(existsBook);
-        } else {
-            throw new BookNotFoundException("Book not found");
-        }
+    public void update(Long id, BookDTO bookDTO) {
+        Book existingBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        existingBook.setAuthor(bookDTO.getAuthor());
+        existingBook.setIsbn(bookDTO.getIsbn());
+        existingBook.setTitle(bookDTO.getTitle());
+        bookRepository.save(existingBook);
     }
+
     public void deleteBook(Long id) {
-        Book book = bookRepository.findById(id).orElse(null);
+        Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        bookRepository.delete(book);
     }
 
-    public BookDTO convertToDTO(Book book) { return modelMapper.map(book, BookDTO.class);}
+    public BookDTO convertToDTO(Book book) {
+        return modelMapper.map(book, BookDTO.class);
+    }
 }

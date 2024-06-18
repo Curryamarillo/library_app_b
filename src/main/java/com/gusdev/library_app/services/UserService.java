@@ -6,8 +6,13 @@ import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
+
 
 @Service
 public class UserService {
@@ -15,10 +20,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
 
+    @Autowired
     public UserService(UserRepository userRepository, ModelMapper modelMapper) {
-
         this.userRepository = userRepository;
-
         this.modelMapper = modelMapper;
     }
 
@@ -30,11 +34,11 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Iterable<UserDTO> findAll() {
-        Iterable<User> users = userRepository.findAll();
-        return  () -> StreamSupport.stream(users.spliterator(), false)
+    public List<UserDTO> findAll() {
+        List<User> users = userRepository.findAll();
+        return users.stream()
                 .map(user -> modelMapper.map(user, UserDTO.class))
-                .iterator();
+                .collect(Collectors.toList());
     }
 
     public UserDTO findById(Long id) {
@@ -58,11 +62,10 @@ public class UserService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        /* TODO when Loans services is ready, we have to check if we can delete loans and users
-
-         */
+        // TODO when Loans services is ready, we have to check if we can delete loans and users
         userRepository.delete(user);
     }
+
     public UserDTO convertToDTO(User user) {
         return modelMapper.map(user, UserDTO.class);
     }

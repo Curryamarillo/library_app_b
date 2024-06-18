@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -28,8 +31,8 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Iterable<UserDTO>> findAll() {
-        Iterable<UserDTO> usersList = userService.findAll();
+    public ResponseEntity<List<UserDTO>> findAll() {
+        List<UserDTO> usersList = userService.findAll();
         return ResponseEntity.ok(usersList);
     }
 
@@ -53,10 +56,10 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 }
-
