@@ -5,6 +5,7 @@ import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
+import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,12 @@ import java.util.Optional;
 @Service
 public class BookService {
 
+    @Autowired
     private final BookRepository bookRepository;
+    @Autowired
     private final ModelMapper modelMapper;
 
-    @Autowired
+
     public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
         this.modelMapper = modelMapper;
@@ -53,8 +56,9 @@ public class BookService {
         return books;
     }
 
-    public Optional<Book> findById(Long id) {
-        return bookRepository.findById(id);
+
+    public Optional<BookDTO> findById(Long id) {
+        return bookRepository.findById(id).map(this::convertToDTO);
     }
 
     public void update(Long id, BookDTO bookDTO) {

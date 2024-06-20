@@ -45,9 +45,9 @@ public class BookController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Book> findById(@PathVariable Long id) {
-        Book book = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
-        return ResponseEntity.ok(book);
+    public ResponseEntity<BookDTO> findById(@PathVariable Long id) {
+        BookDTO bookDTO = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        return ResponseEntity.ok(bookDTO);
     }
 
     @GetMapping("/author/{author}")
