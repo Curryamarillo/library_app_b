@@ -2,7 +2,6 @@ package com.gusdev.library_app.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gusdev.library_app.controller.BookController;
 import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -120,17 +118,17 @@ public class BookControllerTests {
 
     @Test
     void findBookById() throws Exception {
-        given(bookService.findById(1L)).willReturn(Optional.ofNullable(book1));
+        given(bookService.findById(1L)).willReturn(Optional.ofNullable(bookDTO1));
 
         ResultActions result = mockMvc.perform(get("/books/{id}", 1L));
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(book1.getId()))
-                .andExpect(jsonPath("$.title").value(book1.getTitle()))
-                .andExpect(jsonPath("$.author").value(book1.getAuthor()))
-                .andExpect(jsonPath("$.isbn").value(book1.getIsbn()))
-                .andExpect(jsonPath("$.isAvailable").value(book1.getIsAvailable()));
+                .andExpect(jsonPath("$.id").value(bookDTO1.getId()))
+                .andExpect(jsonPath("$.title").value(bookDTO1.getTitle()))
+                .andExpect(jsonPath("$.author").value(bookDTO1.getAuthor()))
+                .andExpect(jsonPath("$.isbn").value(bookDTO1.getIsbn()))
+                .andExpect(jsonPath("$.isAvailable").value(bookDTO1.getIsAvailable()));
     }
     @Test
     void findByIdBookNotFound() throws Exception {

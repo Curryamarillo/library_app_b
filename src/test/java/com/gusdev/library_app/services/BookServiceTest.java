@@ -159,14 +159,15 @@ class BookServiceTest {
     void findByIdTest() {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
-
+        given(modelMapper.map(book1, BookDTO.class)).willReturn(bookDTO1);
         // when
-        Optional<Book> foundBook = bookService.findById(book1.getId());
+        Optional<BookDTO> foundBook = bookService.findById(book1.getId());
 
         // then
         assertTrue(foundBook.isPresent());
-        assertEquals(book1.getTitle(), foundBook.get().getTitle());
+        assertEquals(bookDTO1.getTitle(), foundBook.get().getTitle());
         verify(bookRepository).findById(book1.getId());
+        verify(modelMapper).map(book1, BookDTO.class);
     }
 
     @Test
@@ -176,7 +177,7 @@ class BookServiceTest {
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
 
         // when
-        Optional<Book> foundBook = bookService.findById(nonExistingId);
+        Optional<BookDTO> foundBook = bookService.findById(nonExistingId);
 
         // then
         assertFalse(foundBook.isPresent());
