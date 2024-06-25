@@ -81,6 +81,16 @@ public class BookRepositoryTests {
     }
 
     @Test
+    public void findByTitleContainingIgnoreCaseTest() {
+        // when
+        Iterable<Book> books = bookRepository.findByTitleContainingIgnoreCase("bOok One");
+
+        // then
+        assertThat(books).hasSize(1);
+        assertThat(books.iterator().next().getTitle()).isEqualTo("Book One");
+    }
+
+    @Test
     public void findByAuthorIgnoreCaseTest() {
         // when
         Iterable<Book> books = bookRepository.findByAuthorIgnoreCase("author two");

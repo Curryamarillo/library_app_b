@@ -43,6 +43,11 @@ public class BookController {
         List<Book> books = bookService.findByTitleIgnoreCase(title);
         return ResponseEntity.ok(books);
     }
+    @GetMapping("/title/v2/{title}")
+    public ResponseEntity<List<Book>> findByTitleIgnoreCase(@PathVariable String title) {
+        List<Book> books = bookService.findByTitleContainingIgnoreCase(title);
+        return ResponseEntity.ok(books);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<BookDTO> findById(@PathVariable Long id) {
