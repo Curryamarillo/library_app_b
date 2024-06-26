@@ -2,6 +2,7 @@ package com.gusdev.library_app.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;

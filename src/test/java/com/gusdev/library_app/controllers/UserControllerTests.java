@@ -1,6 +1,7 @@
 package com.gusdev.library_app.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.controller.UserController;
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;

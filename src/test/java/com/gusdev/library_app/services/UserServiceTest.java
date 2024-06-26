@@ -1,5 +1,6 @@
 package com.gusdev.library_app.services;
 
+import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
+import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.util.List;
