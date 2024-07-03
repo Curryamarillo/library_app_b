@@ -64,11 +64,12 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
+    @CrossOrigin
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
         try {
             bookService.update(id, bookDTO);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok(bookDTO);
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

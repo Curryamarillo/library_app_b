@@ -36,6 +36,7 @@ public class UserController {
         return ResponseEntity.ok(usersList);
     }
 
+
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
         try {
@@ -45,7 +46,7 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
-
+    @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
@@ -57,6 +58,7 @@ public class UserController {
         }
     }
 
+    @CrossOrigin
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         userService.deleteUser(id);
