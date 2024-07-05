@@ -46,6 +46,17 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/{email}")
+    public ResponseEntity<UserDTO> findByEmail(@PathVariable String email) {
+        try {
+            UserDTO userDTO = userService.findByEmail(email);
+            return ResponseEntity.ok(userDTO);
+        } catch (UserNotFoundException e) {
+            return  ResponseEntity.notFound().build();
+        }
+    }
+
     @CrossOrigin
     @PutMapping("/{id}")
     public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {

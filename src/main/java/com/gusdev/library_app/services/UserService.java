@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+
 
 
 @Service
@@ -45,6 +45,12 @@ public class UserService {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         return modelMapper.map(user, UserDTO.class);
     }
+
+    public UserDTO findByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        return  modelMapper.map(user, UserDTO.class);
+    }
+
 
     public void update(Long id, User user) {
         User existsUser = userRepository.findById(id).orElse(null);
