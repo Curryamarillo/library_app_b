@@ -47,7 +47,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/{email}")
+    @GetMapping("/email/{email}")
     public ResponseEntity<UserDTO> findByEmail(@PathVariable String email) {
         try {
             UserDTO userDTO = userService.findByEmail(email);
