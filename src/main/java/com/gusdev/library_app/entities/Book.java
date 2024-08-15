@@ -42,4 +42,5 @@ public class Book {
 
     @OneToMany(mappedBy = "book")
     private Set<Loan> loans = new HashSet<>();
+
 }

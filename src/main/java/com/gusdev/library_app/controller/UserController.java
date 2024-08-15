@@ -2,6 +2,7 @@ package com.gusdev.library_app.controller;
 
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;
+import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class UserController {
             UserDTO userDTO = userService.findByEmail(email);
             return ResponseEntity.ok(userDTO);
         } catch (UserNotFoundException e) {
-            return  ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -71,8 +72,14 @@ public class UserController {
 
     @CrossOrigin
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteById(@PathVariable Long id) {
+        try {
+            userService.deleteUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (UserCantBeDeletedHasLoanException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("User cannot be deleted because they have active loans.");
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+        }
     }
 }

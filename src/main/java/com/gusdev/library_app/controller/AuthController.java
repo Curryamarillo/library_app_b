@@ -2,9 +2,7 @@ package com.gusdev.library_app.controller;
 
 import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.LoginResponseDTO;
-import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.services.AuthService;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

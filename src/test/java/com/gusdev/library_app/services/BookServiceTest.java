@@ -1,6 +1,5 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
@@ -13,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.context.SpringBootTest;
 
 
 import java.time.LocalDateTime;
@@ -24,8 +22,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
@@ -133,6 +130,18 @@ class BookServiceTest {
         assertEquals(book1.getTitle(), foundBooks.get(0).getTitle());
         verify(bookRepository).findByTitleContainingIgnoreCase(title);
     }
+
+    @Test
+    void notFindByTitleContainingIgnoreCase() {
+       when(bookRepository.findByTitleContainingIgnoreCase("NoBook"))
+               .thenReturn(Collections.emptyList());
+
+       assertThrows(BookNotFoundException.class, () -> {
+           bookService.findByTitleContainingIgnoreCase("NoBook");
+       });
+        verify(bookRepository).findByTitleContainingIgnoreCase("NoBook");
+    }
+
     @Test
     void findByTitleIgnoreCaseNotFoundTest() {
         // given

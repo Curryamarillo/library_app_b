@@ -1,10 +1,11 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
+import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
+import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,12 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-import org.springframework.boot.test.context.SpringBootTest;
-
 
 import java.util.List;
 import java.util.Optional;
-
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,11 +33,15 @@ class UserServiceTest {
     @Mock
     private ModelMapper modelMapper;
 
+    @Mock
+    private LoanRepository loanRepository;
+
     @InjectMocks
     private UserService userService;
 
     private User user1;
     private UserDTO userDTO;
+
     @BeforeEach
     void setUp() {
        user1 = User.builder()
@@ -98,6 +100,35 @@ class UserServiceTest {
     }
 
     @Test
+    void findByEmailTest() {
+        // given
+        given(userRepository.findByEmail(user1.getEmail())).willReturn(user1);
+        given(modelMapper.map(user1, UserDTO.class)).willReturn(userDTO);
+
+        // when
+        UserDTO foundUser = userService.findByEmail(user1.getEmail());
+
+        // then
+        assertNotNull(foundUser);
+        assertEquals(userDTO.getEmail(), foundUser.getEmail());
+        verify(userRepository).findByEmail(user1.getEmail());
+        verify(modelMapper).map(user1, UserDTO.class);
+    }
+    @Test
+    void findByEmailWhenUserNotFoundShouldReturnNull() {
+        // given
+        String email = "nonexistent@example.com";
+        given(userRepository.findByEmail(email)).willReturn(null);
+
+        // when
+        UserDTO foundUser = userService.findByEmail(email);
+
+        // then
+        assertNull(foundUser);
+        verify(userRepository).findByEmail(email);
+    }
+
+    @Test
     void findById() {
 
         // given
@@ -145,13 +176,26 @@ class UserServiceTest {
     void deleteUser() {
         // given
         given(userRepository.findById(user1.getId())).willReturn(Optional.of(user1));
-
+        given(loanRepository.existsByUserId(user1.getId())).willReturn(false);
         // when
         userService.deleteUser(user1.getId());
 
         // then
         verify(userRepository).findById(user1.getId());
         verify(userRepository).delete(user1);
+    }
+
+    @Test
+    void deleteUserWithLoan() {
+        //given
+        given(userRepository.findById(user1.getId())).willReturn(Optional.of(user1));
+        given((loanRepository.existsByUserId(user1.getId()))).willReturn(true);
+
+        //when & then
+        assertThrows(UserCantBeDeletedHasLoanException.class, () ->{userService.deleteUser(user1.getId());});
+        verify(userRepository, never()).delete(user1);
+
+
     }
 
     @Test

@@ -3,6 +3,7 @@ VALUES ('The Great Gatsby', 'F. Scott Fitzgerald', '978-3-16-148410-0', false, C
 ('To Kill a Mockingbird', 'Harper Lee', '978-3-16-148411-0', false, CURRENT_TIMESTAMP),
 ('1984', 'George Orwell', '978-3-16-148412-0', true, CURRENT_TIMESTAMP),
 ('Pride and Prejudice', 'Jane Austen', '978-0-14-043528-8', false, CURRENT_TIMESTAMP),
+('Pride and Glory', 'Jane Doe', '977-0-14-043530-8', false, CURRENT_TIMESTAMP),
 ('The Lord of the Rings: The Fellowship of the Ring', 'J.R.R. Tolkien', '978-0-547-52951-3', false, CURRENT_TIMESTAMP),
 ('The Hitchhikers Guide to the Galaxy', 'Douglas Adams', '978-0-345-39180-3', true, CURRENT_TIMESTAMP);
 INSERT INTO users (name, surname, email, is_admin, password)

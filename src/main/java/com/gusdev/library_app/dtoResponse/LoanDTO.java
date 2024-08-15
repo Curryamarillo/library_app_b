@@ -1,5 +1,6 @@
 package com.gusdev.library_app.dtoResponse;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;

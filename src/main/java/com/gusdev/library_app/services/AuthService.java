@@ -17,6 +17,7 @@ public class AuthService {
     public LoginResponseDTO authenticate(String email, String password) {
         User user = userRepository.findByEmail(email);
 
+        if (user == null) { return null; };
         if(Objects.equals(user.getEmail(), email) && Objects.equals(user.getPassword(), password)) {
             return new LoginResponseDTO(user.getEmail(), true);
         }

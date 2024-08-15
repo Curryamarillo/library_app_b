@@ -2,7 +2,6 @@ package com.gusdev.library_app.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gusdev.library_app.LibraryAppApplication;
 import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
@@ -20,6 +19,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,7 +45,9 @@ public class BookControllerTests {
 
 
     private Book book1;
+    private Book book2;
     private BookDTO bookDTO1;
+    private BookDTO bookDTO2;
 
     @BeforeEach
     void setUp() {
@@ -59,12 +61,28 @@ public class BookControllerTests {
                 .createdDate(LocalDateTime.now())
                 .build();
 
+        book2 = Book.builder()
+                .id(2L)
+                .title("Book Two")
+                .author("Author Two")
+                .isbn("23456")
+                .isAvailable(false)
+                .build();
+
         bookDTO1 = BookDTO.builder()
                 .id(1L)
                 .title("Book One")
                 .author("Author One")
                 .isbn("12345")
                 .isAvailable(true)
+                .build();
+
+        bookDTO2 = BookDTO.builder()
+                .id(2L)
+                .title("Book Two")
+                .author("Author Two")
+                .isbn("23456")
+                .isAvailable(false)
                 .build();
     }
     @Test
@@ -185,6 +203,75 @@ public class BookControllerTests {
                 .andExpect(jsonPath("$[0].isbn").value(book1.getIsbn()))
                 .andExpect(jsonPath("$[0].isAvailable").value(book1.getIsAvailable()));
     }
+    @Test
+    public void findByTitleIgnoreCaseTestV2() throws Exception {
+
+        Book prideAndPrejudice = Book.builder()
+                .id(4L)
+                .title("Pride and Prejudice")
+                .author("Jane Austen")
+                .isbn("978-0-14-043528-8")
+                .isAvailable(false)
+                .build();
+
+        Book prideAndGlory = Book.builder()
+                .id(5L)
+                .title("Pride and Glory")
+                .author("Jane Doe")
+                .isbn("977-0-14-043530-8")
+                .isAvailable(false)
+                .build();
+
+        BookDTO prideAndPrejudiceDTO = BookDTO.builder()
+                .id(4L)
+                .title("Pride and Prejudice")
+                .author("Jane Austen")
+                .isbn("978-0-14-043528-8")
+                .isAvailable(false)
+                .build();
+
+        BookDTO prideAndGloryDTO = BookDTO.builder()
+                .id(5L)
+                .title("Pride and Glory")
+                .author("Jane Doe")
+                .isbn("977-0-14-043530-8")
+                .isAvailable(false)
+                .build();
+
+
+        List<Book> bookList = Arrays.asList(prideAndPrejudice, prideAndGlory);
+        List<BookDTO> bookDTOList = Arrays.asList(prideAndPrejudiceDTO, prideAndGloryDTO);
+
+
+        given(bookService.findByTitleContainingIgnoreCase("pride")).willReturn(bookList);
+        given(bookService.convertToDTO(prideAndPrejudice)).willReturn(prideAndPrejudiceDTO);
+        given(bookService.convertToDTO(prideAndGlory)).willReturn(prideAndGloryDTO);
+
+
+        ResultActions result = mockMvc.perform(get("/books/title/v2/{title}", "pride")
+                .contentType(MediaType.APPLICATION_JSON));
+
+
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").value(prideAndPrejudiceDTO.getId()))
+                .andExpect(jsonPath("$[0].title").value(prideAndPrejudiceDTO.getTitle()))
+                .andExpect(jsonPath("$[0].author").value(prideAndPrejudiceDTO.getAuthor()))
+                .andExpect(jsonPath("$[0].isbn").value(prideAndPrejudiceDTO.getIsbn()))
+                .andExpect(jsonPath("$[0].isAvailable").value(prideAndPrejudiceDTO.getIsAvailable()))
+                .andExpect(jsonPath("$[1].id").value(prideAndGloryDTO.getId()))
+                .andExpect(jsonPath("$[1].title").value(prideAndGloryDTO.getTitle()))
+                .andExpect(jsonPath("$[1].author").value(prideAndGloryDTO.getAuthor()))
+                .andExpect(jsonPath("$[1].isbn").value(prideAndGloryDTO.getIsbn()))
+                .andExpect(jsonPath("$[1].isAvailable").value(prideAndGloryDTO.getIsAvailable()));
+
+
+        verify(bookService, times(1)).findByTitleContainingIgnoreCase("pride");
+        verify(bookService, times(1)).convertToDTO(prideAndPrejudice);
+        verify(bookService, times(1)).convertToDTO(prideAndGlory);
+    }
+
 
     @Test
     void findByAuthorIgnoreCase() throws Exception {

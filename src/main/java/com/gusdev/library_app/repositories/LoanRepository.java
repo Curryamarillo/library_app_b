@@ -9,4 +9,6 @@ import java.util.Optional;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, Long> {
     Optional<Loan> findFirstByBookIdAndReturnDateIsNullOrderByLoanDateDesc(Long bookId);
+
+    boolean existsByUserId(Long id);
 }

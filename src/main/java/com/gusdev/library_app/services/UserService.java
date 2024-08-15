@@ -3,7 +3,9 @@ package com.gusdev.library_app.services;
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
+import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
+import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.repositories.UserRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +21,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final LoanRepository loanRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+    public UserService(UserRepository userRepository, ModelMapper modelMapper, LoanRepository loanRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
+        this.loanRepository = loanRepository;
     }
 
     public User create(User user) {
@@ -68,7 +72,10 @@ public class UserService {
 
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        // TODO when Loans services is ready, we have to check if we can delete loans and users
+        boolean userHasLoans = loanRepository.existsByUserId(id);
+        if(userHasLoans) {
+            throw new UserCantBeDeletedHasLoanException("User cannot be deleted because they have active loans.");
+        }
         userRepository.delete(user);
     }
 
