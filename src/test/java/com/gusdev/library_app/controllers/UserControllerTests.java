@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gusdev.library_app.controller.UserController;
 import com.gusdev.library_app.dtoResponse.UserDTO;
 import com.gusdev.library_app.entities.User;
+import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.repositories.UserRepository;
 import com.gusdev.library_app.services.UserService;
@@ -17,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,14 +26,14 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
 @AutoConfigureMockMvc
+
 @Import({UserController.class, UserService.class})
 public class UserControllerTests {
 
@@ -122,6 +124,30 @@ public class UserControllerTests {
 
         result.andExpect(status().isNotFound());
     }
+    @Test
+    void findByEmail() throws Exception {
+        String user1Email = user1.getEmail();
+        given(userService.findByEmail(user1Email)).willReturn(userDTO1);
+
+        ResultActions result = mockMvc.perform(get("/users/email/{email}", user1Email));
+
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.id").value(userDTO1.getId()))
+                .andExpect(jsonPath("$.name").value(userDTO1.getName()))
+                .andExpect(jsonPath("$.surname").value(userDTO1.getSurname()))
+                .andExpect(jsonPath("$.email").value(userDTO1.getEmail()));
+
+    }
+
+    @Test
+    void UserNotFoundByEmail() throws Exception {
+        String user1Email = user1.getEmail();
+        given(userService.findByEmail(user1Email)).willThrow(new UserNotFoundException("User not found"));
+
+        ResultActions result = mockMvc.perform(get("/users/email/{email}", user1Email));
+        result.andExpect(status().isNotFound());
+    }
 
     @Test
     void updateUser_Success() throws Exception {
@@ -153,10 +179,34 @@ public class UserControllerTests {
 
     @Test
     void deleteUser_Success() throws Exception {
-        doNothing().when(userService).deleteUser(1L);
+        Long userId = user1.getId();
 
-        ResultActions result = mockMvc.perform(delete("/users/{id}", 1L));
+        mockMvc.perform(delete("/users/{id}", userId))
+                .andExpect(status().isNoContent());
 
-        result.andExpect(status().isNoContent());
+        verify(userService).deleteUser(userId);
+    }
+
+    @Test
+    void deleteUser_UserCantBeDeletedHasLoanException() throws Exception {
+        Long userId = user1.getId();
+
+        doThrow(new UserCantBeDeletedHasLoanException("User cannot be deleted because they have active loans."))
+                .when(userService).deleteUser(userId);
+
+        mockMvc.perform(delete("/users/{id}", userId))
+                .andExpect(status().isConflict())
+                .andExpect(MockMvcResultMatchers.content().string("User cannot be deleted because they have active loans."));
+    }
+
+    @Test
+    void deleteUser_UserNotFoundException() throws Exception {
+        Long userId = user1.getId();
+
+        doThrow(new UserNotFoundException("User not found")).when(userService).deleteUser(userId);
+
+        mockMvc.perform(delete("/users/{id}", userId))
+                .andExpect(status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string("User not found"));
     }
 }

@@ -79,7 +79,7 @@ public class UserController {
         } catch (UserCantBeDeletedHasLoanException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("User cannot be deleted because they have active loans.");
         } catch (UserNotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found.");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
         }
     }
 }
