@@ -5,7 +5,6 @@ import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.repositories.UserRepository;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -40,23 +39,12 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         User userEntity = userRepository.findByEmail(username);
 
-        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-
-        if (userEntity.getIsAdmin()) {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
-        } else {
-            authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+        if (userEntity == null) {
+            throw new UsernameNotFoundException("User not found");
         }
+        return userEntity;
 
 
-        return new org.springframework.security.core.userdetails.User(
-                userEntity.getUsername(),
-                userEntity.getPassword(),
-                userEntity.isEnabled(),
-                userEntity.isAccountNonExpired(),
-                userEntity.isCredentialsNonExpired(),
-                userEntity.isAccountNonLocked(),
-                authorityList);
         }
         public AuthResponseDTO createUser(@NotNull CreateUserRequestDTO createUserRequest) {
         String email = createUserRequest.email();
@@ -84,7 +72,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
             SecurityContext securityContextHolder = SecurityContextHolder.getContext();
             Authentication authentication = new UsernamePasswordAuthenticationToken(userSaved, null, authorities);
             String accessToken = jwtUtils.createToken(authentication);
-        return new AuthResponseDTO(email, "User created Succesfully",isAdmin,accessToken, true);
+        return new AuthResponseDTO(email, "User created Succesfully", isAdmin, isAdmin, accessToken, true);
         }
 
         public AuthResponseDTO loginUser(LoginRequestDTO authLogin) {
@@ -95,7 +83,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String accessToken = jwtUtils.createToken(authentication);
-            return new AuthResponseDTO(username, "User logged succesfully", true, accessToken, true);
+        Boolean isAdmin = userRepository.findByEmail(username).getIsAdmin();
+            return new AuthResponseDTO(username, "User logged succesfully", true, isAdmin,  accessToken, true);
         }
 
     public Authentication authenticate(String email, String password) {

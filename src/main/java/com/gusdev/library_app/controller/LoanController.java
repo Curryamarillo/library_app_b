@@ -4,6 +4,7 @@ import com.gusdev.library_app.dtoResponse.LoanDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.services.LoanService;
+import com.gusdev.library_app.utils.LoanMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,13 +20,11 @@ import java.util.List;
 public class LoanController {
 
     private final LoanService loanService;
-    private final ModelMapper modelMapper;
 
 
     @Autowired
-    public LoanController(LoanService loanService, ModelMapper modelMapper) {
+    public LoanController(LoanService loanService) {
         this.loanService = loanService;
-        this.modelMapper = modelMapper;
     }
 
 
@@ -36,7 +35,7 @@ public class LoanController {
 
         List<LoanDTO> loanDTOList = new ArrayList<>();
         for (LoanDTO loan : loans) {
-            loanDTOList.add(modelMapper.map(loan, LoanDTO.class));
+            loanDTOList.add(loan);
         }
         return ResponseEntity.ok(loanDTOList);
     }
@@ -46,7 +45,7 @@ public class LoanController {
     @PostMapping("/create")
     public ResponseEntity<LoanDTO> createLoan(@RequestBody Loan loan) {
         Loan createdLoan = loanService.create(loan);
-        LoanDTO createdLoanDTO = loanService.convertToDTO(createdLoan);
+        LoanDTO createdLoanDTO = LoanMapper.toDTO(createdLoan);
         return new ResponseEntity<>(createdLoanDTO, HttpStatus.CREATED);
     }
 

@@ -2,41 +2,31 @@ package com.gusdev.library_app.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
-import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
-import com.gusdev.library_app.services.AuthService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
-    private AuthService authService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-//    private LoginRequestDTO loginRequestDTO;
-//    private LoginResponseDTO loginResponseDTO;
-
-    @BeforeEach
-    void setUp() {
+//    @Autowired
+//    private MockMvc mockMvc;
+//
+//    @MockBean
+//    private AuthService authService;
+//
+//    @Autowired
+//    private ObjectMapper objectMapper;
+//
+////    private LoginRequestDTO loginRequestDTO;
+////    private LoginResponseDTO loginResponseDTO;
+//
+//    @BeforeEach
+//    void setUp() {
 //        loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
 //        loginResponseDTO = new LoginResponseDTO("test@example.com", true);
     }
@@ -66,4 +56,4 @@ public class AuthControllerTest {
 //                .andExpect(status().isUnauthorized())
 //                .andExpect(MockMvcResultMatchers.content().string("Email or password incorrect"));
 //    }
-}
+// }

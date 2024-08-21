@@ -5,10 +5,10 @@ import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
+import com.gusdev.library_app.utils.LoanMapper;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -17,11 +17,9 @@ public class LoanService {
 
 
     private final LoanRepository loanRepository;
-    private final ModelMapper modelMapper;
 
-    public LoanService(LoanRepository loanRepository, ModelMapper modelMapper) {
+    public LoanService(LoanRepository loanRepository) {
         this.loanRepository = loanRepository;
-        this.modelMapper = modelMapper;
     }
 
     public Loan create(Loan loan) {
@@ -32,22 +30,15 @@ public class LoanService {
         return loanRepository.save(loan);
     }
     public List<LoanDTO> findAll() {
-        Iterable<Loan> loans = loanRepository.findAll();
-        List<LoanDTO> loanDTOList = new ArrayList<>();
-        for (Loan loan : loans) {
-            LoanDTO loanDTO = modelMapper.map(loan, LoanDTO.class);
-            loanDTOList.add(loanDTO);
-        }
-        return loanDTOList;
+        List<Loan> loans = loanRepository.findAll();
+        return LoanMapper.toDTOList(loans);
     }
     public LoanDTO findById(Long id) {
         Loan loan = loanRepository.findById(id).orElseThrow(() -> new LoanNotFoundException("Book not found"));
-        return modelMapper.map(loan, LoanDTO.class);
+        return LoanMapper.toDTO(loan);
     }
     public void deleteById(Long id) {
         loanRepository.deleteById(id);
     }
-    public LoanDTO convertToDTO(Loan loan) {
-        return modelMapper.map(loan, LoanDTO.class);
-    }
+
 }

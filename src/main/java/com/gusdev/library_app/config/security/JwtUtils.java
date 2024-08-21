@@ -26,12 +26,12 @@ public class JwtUtils {
 
     public String createToken(Authentication authentication) {
         Algorithm algorithm = Algorithm.HMAC256(this.privateKey);
-    String username = authentication.getPrincipal().toString();
-    String authorities = authentication.getAuthorities()
+        String username = authentication.getPrincipal().toString();
+        String authorities = authentication.getAuthorities()
             .stream().map(GrantedAuthority::getAuthority)
             .collect(Collectors.joining(","));
 
-    String jwtToken = JWT.create()
+        return JWT.create()
             .withIssuer(this.userGenerator)
             .withSubject(username)
             .withClaim("authorities", authorities)
@@ -40,7 +40,6 @@ public class JwtUtils {
             .withJWTId(UUID.randomUUID().toString())
             .withNotBefore(new Date(System.currentTimeMillis()))
             .sign(algorithm);
-    return jwtToken;
     }
     public DecodedJWT validateToken(String token) {
         try {
@@ -48,8 +47,7 @@ public class JwtUtils {
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(this.userGenerator)
                     .build();
-            DecodedJWT decodedJWT = verifier.verify(token);
-            return  decodedJWT;
+            return verifier.verify(token);
         } catch (JWTVerificationException exception) {
             throw  new JWTVerificationException("Token Invalid, not authorized");
         }

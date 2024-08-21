@@ -62,10 +62,7 @@
 			<optional>true</optional>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt-api -->
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-security</artifactId>
-			</dependency>
+
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -116,12 +113,13 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.0.0</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
-			<version>RELEASE</version>
-			<scope>compile</scope>
+			<version>24.1.0</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>

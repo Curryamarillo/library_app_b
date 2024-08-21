@@ -16,67 +16,67 @@ import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthServiceTest {
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private AuthService authService;
-
-    private String email;
-    private String password;
-    private String incorrectPassword;
-    private User user;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-
-        email = "test@example.com";
-        password = "password123";
-        incorrectPassword = "wrongpassword";
-
-        // Instancia el objeto User aquí
-        user = new User();
-        user.setEmail(email);
-        user.setPassword(password);
-    }
-
-    @Test
-    void authenticateWhenCredentialsAreCorrectShouldReturnLoginResponse() {
-//        // given
-//        given(userRepository.findByEmail(email)).willReturn(user);
 //
-//        // when
-//        LoginResponseDTO response = authService.authenticate(email, password);
+//    @Mock
+//    private UserRepository userRepository;
 //
-//        // then
-//        assertNotNull(response);
-//        assertEquals(email, response.getEmail());
-//        assertTrue(response.isAuthenticated());
-    }
-
-    @Test
-    void authenticateWhenUserDoesNotExistShouldReturnNull() {
-//        // given
-//        given(userRepository.findByEmail(email)).willReturn(null);
+//    @InjectMocks
+//    private AuthService authService;
 //
-//        // when
-//        LoginResponseDTO responseDTO = authService.authenticate(email, password);
+//    private String email;
+//    private String password;
+//    private String incorrectPassword;
+//    private User user;
 //
-//        // then
-//        assertNull(responseDTO);
-    }
-
-    @Test
-    void authenticateWhenPasswordIsIncorrectShouldReturnNull() {
-//        // given
-//        given(userRepository.findByEmail(email)).willReturn(user);
+//    @BeforeEach
+//    void setUp() {
+//        MockitoAnnotations.openMocks(this);
 //
-//        // when
-//        LoginResponseDTO responseDTO = authService.authenticate(email, incorrectPassword);
+//        email = "test@example.com";
+//        password = "password123";
+//        incorrectPassword = "wrongpassword";
 //
-//        // then
-//        assertNull(responseDTO);
-    }
+//        // Instancia el objeto User aquí
+//        user = new User();
+//        user.setEmail(email);
+//        user.setPassword(password);
+//    }
+//
+//    @Test
+//    void authenticateWhenCredentialsAreCorrectShouldReturnLoginResponse() {
+////        // given
+////        given(userRepository.findByEmail(email)).willReturn(user);
+////
+////        // when
+////        LoginResponseDTO response = authService.authenticate(email, password);
+////
+////        // then
+////        assertNotNull(response);
+////        assertEquals(email, response.getEmail());
+////        assertTrue(response.isAuthenticated());
+//    }
+//
+//    @Test
+//    void authenticateWhenUserDoesNotExistShouldReturnNull() {
+////        // given
+////        given(userRepository.findByEmail(email)).willReturn(null);
+////
+////        // when
+////        LoginResponseDTO responseDTO = authService.authenticate(email, password);
+////
+////        // then
+////        assertNull(responseDTO);
+//    }
+//
+//    @Test
+//    void authenticateWhenPasswordIsIncorrectShouldReturnNull() {
+////        // given
+////        given(userRepository.findByEmail(email)).willReturn(user);
+////
+////        // when
+////        LoginResponseDTO responseDTO = authService.authenticate(email, incorrectPassword);
+////
+////        // then
+////        assertNull(responseDTO);
+//    }
 }

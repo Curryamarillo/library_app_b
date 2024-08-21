@@ -5,6 +5,7 @@ import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
+import com.gusdev.library_app.utils.BookMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,13 +51,7 @@ class BookServiceTest {
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        bookDTO1 = BookDTO.builder()
-                .id(1L)
-                .title("Book One")
-                .author("Author One")
-                .isbn("12345")
-                .isAvailable(true)
-                .build();
+        bookDTO1 = new BookDTO(1L,"Book One","Author One","12345",true);
     }
     @Test
     void createBookTest() {
@@ -190,7 +185,7 @@ class BookServiceTest {
 
         // then
         assertTrue(foundBook.isPresent());
-        assertEquals(bookDTO1.getTitle(), foundBook.get().getTitle());
+        assertEquals(bookDTO1.title(), foundBook.get().title());
         verify(bookRepository).findById(book1.getId());
         verify(modelMapper).map(book1, BookDTO.class);
     }
@@ -258,19 +253,5 @@ class BookServiceTest {
         assertThrows(BookNotFoundException.class, () -> bookService.deleteBook(nonExistingId));
         verify(bookRepository).findById(nonExistingId);
         verify(bookRepository, never()).delete(any());
-    }
-
-    @Test
-    void convertToDTOTest() {
-        // given
-        given(modelMapper.map(book1, BookDTO.class)).willReturn(bookDTO1);
-
-        // when
-        BookDTO mappedBookDTO = bookService.convertToDTO(book1);
-
-        // then
-        assertNotNull(mappedBookDTO);
-        assertEquals(book1.getTitle(), mappedBookDTO.getTitle());
-        verify(modelMapper).map(book1, BookDTO.class);
     }
 }

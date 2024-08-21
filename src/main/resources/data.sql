@@ -15,12 +15,12 @@ VALUES ('The Great Gatsby', 'F. Scott Fitzgerald', '978-3-16-148410-0', false, C
 ('The Hitchhikers Guide to the Galaxy', 'Douglas Adams', '978-0-345-39180-3', false, CURRENT_TIMESTAMP);
 INSERT INTO users (name, surname, email, is_admin, password)
 VALUES
-  ('John', 'Doe', 'john.doe@example.com', false, 'password123'),
-  ('Jane', 'Smith', 'jane.smith@example.com', false, 'password456'),
-  ('Michael', 'Johnson', 'michael.johnson@example.com', true, 'adminPassword'),
-  ('Alice', 'Williams', 'alice.williams@example.com', false, 'secretPassword'),
-  ('David', 'Miller', 'david.miller@example.com', false, 'anotherPassword'),
-  ('Emily', 'Garcia', 'emily.garcia@example.com', false, 'strongPassword');
+  ('John', 'Doe', 'john.doe@example.com', false, '$2a$10$FBoSaPy6NA5bFCZv786tI.G4KZDqwVGERr8RBFHLKY5crP/aM2alu'),
+  ('Jane', 'Smith', 'jane.smith@example.com', false, '$2a$10$v6c3OB9yK0BlfKwQkD0b0.Sthu.bqBsbKy9WXudKoKFhruX1n0sEa'),
+  ('Michael', 'Johnson', 'michael.johnson@example.com', true, '$2a$10$4VdpRLU3KHHkKzF8lcgGTOD20eXbpLazgklyE8/y2B8jHahLxupYS'),
+  ('Alice', 'Williams', 'alice.williams@example.com', false, '$2a$10$G3m7M2P2aNKWXUO8z8eC0Oojj0qq7uJQ35p38VvIcnxlcfpzRWhBe'),
+  ('David', 'Miller', 'david.miller@example.com', false, '$2a$10$Aikt6ZMRieVv1y/v8ci.Wuj070bWtT.14GHG/lWiOVxUlVBoy8lji'),
+  ('Emily', 'Garcia', 'emily.garcia@example.com', false, '$2a$10$4L1g1SXLwODg95puLgnWVO3Ej1RKewLSFBymHrHBeakszZxjeXZyu');
 INSERT INTO loans (user_id, book_id, loan_date)
 VALUES (
   (SELECT id FROM users WHERE email = 'john.doe@example.com'),
@@ -42,3 +42,11 @@ VALUES (
   (SELECT id FROM books WHERE title = 'The Hitchhikers Guide to the Galaxy'),
   CURRENT_TIMESTAMP
 );
+/*
+Original: password123 | Encoded: $2a$10$FBoSaPy6NA5bFCZv786tI.G4KZDqwVGERr8RBFHLKY5crP/aM2alu
+Original: password456 | Encoded: $2a$10$v6c3OB9yK0BlfKwQkD0b0.Sthu.bqBsbKy9WXudKoKFhruX1n0sEa
+Original: adminPassword | Encoded: $2a$10$4VdpRLU3KHHkKzF8lcgGTOD20eXbpLazgklyE8/y2B8jHahLxupYS
+Original: secretPassword | Encoded: $2a$10$G3m7M2P2aNKWXUO8z8eC0Oojj0qq7uJQ35p38VvIcnxlcfpzRWhBe
+Original: anotherPassword | Encoded: $2a$10$Aikt6ZMRieVv1y/v8ci.Wuj070bWtT.14GHG/lWiOVxUlVBoy8lji
+Original: strongPassword | Encoded: $2a$10$4L1g1SXLwODg95puLgnWVO3Ej1RKewLSFBymHrHBeakszZxjeXZyu
+*/

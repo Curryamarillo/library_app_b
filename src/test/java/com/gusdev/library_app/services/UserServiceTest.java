@@ -7,13 +7,13 @@ import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.repositories.UserRepository;
+import com.gusdev.library_app.utils.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,16 +31,17 @@ class UserServiceTest {
     private UserRepository userRepository;
 
     @Mock
-    private ModelMapper modelMapper;
-
-    @Mock
     private LoanRepository loanRepository;
 
     @InjectMocks
     private UserService userService;
 
     private User user1;
-    private UserDTO userDTO;
+    private User user2;
+    private UserDTO userDTO1;
+    private UserDTO userDTO2;
+
+
 
     @BeforeEach
     void setUp() {
@@ -51,13 +52,17 @@ class UserServiceTest {
                 .isAdmin(false)
                 .password("password123")
                 .build();
-
-       userDTO = UserDTO.builder()
-                .name("Name one")
-                .surname("Surname one")
-                .email("one@onemail.com")
-                .isAdmin(false)
+        user2 = User.builder()
+                .name("Name two")
+                .surname("Surname two")
+                .email("two@onemail.com")
+                .isAdmin(true)
+                .password("password234")
                 .build();
+
+       userDTO1 = new UserDTO(1L,"Name one", "Surname one","one@onamail.com", false);
+       userDTO2 = new UserDTO(2L, "Name two", "Surname two", "two@onemail.com", true);
+//
     }
     @Test
     void createUserTest() {
@@ -85,17 +90,18 @@ class UserServiceTest {
     }
     @Test
     void findAll() {  // given
-        List<User> users = List.of(user1);
+        List<User> users = List.of(user1, user2);
+        List<UserDTO> userDTOList = List.of(userDTO1, userDTO2);
         given(userRepository.findAll()).willReturn(users);
-        given(modelMapper.map(user1, UserDTO.class)).willReturn(userDTO);
+        given(UserMapper.toDTOList(users)).willReturn(userDTOList);
 
         // when
         List<UserDTO> foundUsers = userService.findAll();
 
         // then
         assertNotNull(foundUsers);
-        assertEquals(1, foundUsers.size());
-        assertEquals(userDTO.getEmail(), foundUsers.get(0).getEmail());
+        assertEquals(2, foundUsers.size());
+        assertEquals(userDTOList, foundUsers);
         verify(userRepository).findAll();
     }
 
@@ -103,16 +109,15 @@ class UserServiceTest {
     void findByEmailTest() {
         // given
         given(userRepository.findByEmail(user1.getEmail())).willReturn(user1);
-        given(modelMapper.map(user1, UserDTO.class)).willReturn(userDTO);
+        given(UserMapper.toDTO(user1)).willReturn(userDTO1);
 
         // when
         UserDTO foundUser = userService.findByEmail(user1.getEmail());
 
         // then
         assertNotNull(foundUser);
-        assertEquals(userDTO.getEmail(), foundUser.getEmail());
+        assertEquals(userDTO1.email(), foundUser.email());
         verify(userRepository).findByEmail(user1.getEmail());
-        verify(modelMapper).map(user1, UserDTO.class);
     }
     @Test
     void findByEmailWhenUserNotFoundShouldReturnNull() {
@@ -140,7 +145,7 @@ class UserServiceTest {
 
         // then
         assertNotNull(foundUser);
-        assertEquals(user1.getEmail(), foundUser.getEmail());
+        assertEquals(user1.getEmail(), foundUser.email());
         verify(userRepository).findById(user1.getId());
     }
 
@@ -209,7 +214,7 @@ class UserServiceTest {
 
         // then
         assertNotNull(mappedUserDTO);
-        assertEquals(user1.getEmail(), mappedUserDTO.getEmail());
+        assertEquals(user1.getEmail(), mappedUserDTO.email());
         verify(modelMapper).map(user1, UserDTO.class);
     }
 }

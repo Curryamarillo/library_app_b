@@ -4,12 +4,12 @@ import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.services.BookService;
-import jakarta.annotation.PreDestroy;
+import com.gusdev.library_app.utils.BookMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +35,7 @@ public class BookController {
     public ResponseEntity<List<BookDTO>> findAll() {
         List<Book> bookList = bookService.findAll();
         List<BookDTO> bookDTOList = bookList.stream()
-                .map(bookService::convertToDTO)
+                .map(BookMapper::toDto)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(bookDTOList);
     }
@@ -49,7 +49,7 @@ public class BookController {
     public ResponseEntity<List<BookDTO>> findByTitleIgnoreCase(@PathVariable String title) {
         List<Book> books = bookService.findByTitleContainingIgnoreCase(title);
         List<BookDTO> bookDTOList = books.stream()
-                .map(bookService::convertToDTO)
+                .map(BookMapper::toDto)
                 .toList();
         return ResponseEntity.ok(bookDTOList);
     }

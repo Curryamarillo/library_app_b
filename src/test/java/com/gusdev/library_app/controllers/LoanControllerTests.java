@@ -9,6 +9,7 @@ import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.services.LoanService;
+import com.gusdev.library_app.utils.LoanMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,9 @@ class LoanControllerTests {
 
     private Loan loan1;
     private LoanDTO loanDTO1;
+    private LoanDTO loanDTO2;
+    private final LocalDateTime loanDate = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
+    private final LocalDateTime returnDate = (LocalDateTime.of(2024, 01, 01, 12, 00));
 
     @BeforeEach
     void setUp() {
@@ -57,21 +61,17 @@ class LoanControllerTests {
         loan1.setId(1L);
         loan1.setUser(new User());
         loan1.setBook(new Book());
-        loan1.setLoanDate(LocalDateTime.of(2023, 1, 1, 0, 0, 0));
-        loan1.setReturnDate(LocalDateTime.of(2024, 01, 01, 12, 00));
+        loan1.setLoanDate(loanDate);
+        loan1.setReturnDate(returnDate);
 
-        loanDTO1 = new LoanDTO();
-        loanDTO1.setId(1L);
-        loanDTO1.setUserId(1L);
-        loanDTO1.setBookId(1L);
-        loanDTO1.setLoanDate(LocalDateTime.of(2023, 1, 1, 0, 0, 0));
-        loanDTO1.setReturnDate(LocalDateTime.of(2024, 01, 01, 12, 00));
+        loanDTO1 = new LoanDTO(1L, 1L, 1L, loanDate, returnDate);
+        loanDTO2 = new LoanDTO(2L, 2L, 2L, loanDate, returnDate);
     }
 
     @Test
     void createLoanTest() throws Exception{
         given(loanService.create(any(Loan.class))).willReturn(loan1);
-        given(loanService.convertToDTO(loan1)).willReturn(loanDTO1);
+        given(LoanMapper.toDTO(loan1)).willReturn(loanDTO1);
 
         ResultActions result = mockMvc.perform(post("/loans/create")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,9 +79,9 @@ class LoanControllerTests {
 
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(loanDTO1.getId()))
-                .andExpect(jsonPath("$.userId").value(loanDTO1.getUserId()))
-                .andExpect(jsonPath("$.bookId").value(loanDTO1.getBookId()))
+                .andExpect(jsonPath("$.id").value(loanDTO1.id()))
+                .andExpect(jsonPath("$.userId").value(loanDTO1.userId()))
+                .andExpect(jsonPath("$.bookId").value(loanDTO1.bookId()))
                 .andExpect(jsonPath("$.loanDate[0]").value(2023)) // Year
                 .andExpect(jsonPath("$.loanDate[1]").value(1))    // Month
                 .andExpect(jsonPath("$.loanDate[2]").value(1))    // Day
@@ -97,12 +97,6 @@ class LoanControllerTests {
 
     @Test
     void findAllLoansTest() throws Exception {
-        LoanDTO loanDTO2 = new LoanDTO();
-        loanDTO2.setId(2L);
-        loanDTO2.setUserId(2L);
-        loanDTO2.setBookId(2L);
-        loanDTO2.setLoanDate(LocalDateTime.of(2023, 2, 1, 0, 0, 0));
-        loanDTO2.setReturnDate(LocalDateTime.of(2024, 02, 01, 12, 0));
 
         List<LoanDTO> loanDTOList = Arrays.asList(loanDTO1, loanDTO2);
         given(loanService.findAll()).willReturn(loanDTOList);
@@ -111,12 +105,12 @@ class LoanControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(loanDTO1.getId()))
-                .andExpect(jsonPath("$[0].userId").value(loanDTO1.getUserId()))
-                .andExpect(jsonPath("$[0].bookId").value(loanDTO1.getBookId()))
-                .andExpect(jsonPath("$[1].id").value(loanDTO2.getId()))
-                .andExpect(jsonPath("$[1].userId").value(loanDTO2.getUserId()))
-                .andExpect(jsonPath("$[1].bookId").value(loanDTO2.getBookId()));
+                .andExpect(jsonPath("$[0].id").value(loanDTO1.id()))
+                .andExpect(jsonPath("$[0].userId").value(loanDTO1.userId()))
+                .andExpect(jsonPath("$[0].bookId").value(loanDTO1.bookId()))
+                .andExpect(jsonPath("$[1].id").value(loanDTO2.id()))
+                .andExpect(jsonPath("$[1].userId").value(loanDTO2.userId()))
+                .andExpect(jsonPath("$[1].bookId").value(loanDTO2.bookId()));
     }
 
     @Test
@@ -126,9 +120,9 @@ class LoanControllerTests {
         mockMvc.perform(get("/loans/{id}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(loanDTO1.getId()))
-                .andExpect(jsonPath("$.userId").value(loanDTO1.getUserId()))
-                .andExpect(jsonPath("$.bookId").value(loanDTO1.getBookId()));
+                .andExpect(jsonPath("$.id").value(loanDTO1.id()))
+                .andExpect(jsonPath("$.userId").value(loanDTO1.userId()))
+                .andExpect(jsonPath("$.bookId").value(loanDTO1.bookId()));
     }
     @Test
     void findLoanByIdNotFoundTest() throws Exception {

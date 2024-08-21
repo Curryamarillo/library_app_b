@@ -8,6 +8,7 @@ import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
+import com.gusdev.library_app.utils.LoanMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,31 +34,34 @@ class LoanServiceTest {
     @Mock
     private LoanRepository loanRepository;
 
-    @Mock
-    private ModelMapper modelMapper;
-
     @InjectMocks
     private LoanService loanService;
 
     private Loan loan1;
     private LoanDTO loanDTO1;
+    private LoanDTO loanDTO2;
+    private User user1;
+    private User user2;
+    private Book book1;
+    private Book book2;
+    private final LocalDateTime loanDate = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
+    private final LocalDateTime returnDate = (LocalDateTime.of(2024, 01, 01, 12, 00));
 
     @BeforeEach
     void setUp() {
-        loan1 = Loan.builder()
-                .id(1L)
-                .user(new User())
-                .book(new Book())
-                .loanDate(LocalDateTime.now())
-                .returnDate(null)
-                .build();
+        loan1.setId(1L);
+        loan1.setUser(new User());
+        loan1.setBook(new Book());
+        loan1.setLoanDate(loanDate);
+        loan1.setReturnDate(returnDate);
 
-        loanDTO1 = new LoanDTO();
-        loanDTO1.setId(1L);
-        loanDTO1.setUserId(loan1.getUser().getId());
-        loanDTO1.setBookId(loan1.getBook().getId());
-        loanDTO1.setLoanDate(loan1.getLoanDate());
-        loanDTO1.setReturnDate(null);
+        user1.setId(1L);
+        user1.setName("Name one");
+        user1.setSurname("Surname one");
+        user1
+
+        loanDTO1 = new LoanDTO(1L, 1L, 1L, loanDate, returnDate);
+        loanDTO2 = new LoanDTO(2L, 2L, 2L, loanDate, returnDate);
     }
 
     @Test
@@ -93,7 +97,7 @@ class LoanServiceTest {
         given(loanRepository.findAll()).willReturn(loans);
 
 
-        given(modelMapper.map(any(Loan.class), eq(LoanDTO.class))).willReturn(loanDTO1);
+        given(LoanMapper.toDTOList(loans), eq(LoanDTO.class))).willReturn(loanDTO1);
 
 
         List<LoanDTO> loanDTOList = loanService.findAll();

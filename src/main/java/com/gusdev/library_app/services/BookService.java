@@ -5,6 +5,7 @@ import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
+import com.gusdev.library_app.utils.BookMapper;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,10 @@ public class BookService {
 
     @Autowired
     private final BookRepository bookRepository;
+
     @Autowired
-    private final ModelMapper modelMapper;
-
-
-    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
+    public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
-        this.modelMapper = modelMapper;
     }
 
     public Book create(Book book) {
@@ -55,6 +53,7 @@ public class BookService {
         }
         return books;
     }
+
     public List<Book> findByAuthorIgnoreCase(String author) {
         List<Book> books = bookRepository.findByAuthorIgnoreCase(author);
         if (books.isEmpty()) {
@@ -65,14 +64,15 @@ public class BookService {
 
 
     public Optional<BookDTO> findById(Long id) {
-        return bookRepository.findById(id).map(this::convertToDTO);
+        return bookRepository.findById(id)
+                .map(BookMapper::toDto);
     }
 
     public void update(Long id, BookDTO bookDTO) {
         Book existingBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
-        existingBook.setAuthor(bookDTO.getAuthor());
-        existingBook.setIsbn(bookDTO.getIsbn());
-        existingBook.setTitle(bookDTO.getTitle());
+        existingBook.setAuthor(bookDTO.author());
+        existingBook.setIsbn(bookDTO.isbn());
+        existingBook.setTitle(bookDTO.title());
         bookRepository.save(existingBook);
     }
 
@@ -80,8 +80,6 @@ public class BookService {
         Book book = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
         bookRepository.delete(book);
     }
-
-    public BookDTO convertToDTO(Book book) {
-        return modelMapper.map(book, BookDTO.class);
-    }
 }
+
+

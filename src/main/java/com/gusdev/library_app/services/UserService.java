@@ -7,12 +7,11 @@ import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.repositories.UserRepository;
-import org.modelmapper.ModelMapper;
+import com.gusdev.library_app.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 
@@ -20,13 +19,11 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final ModelMapper modelMapper;
     private final LoanRepository loanRepository;
 
     @Autowired
-    public UserService(UserRepository userRepository, ModelMapper modelMapper, LoanRepository loanRepository) {
+    public UserService(UserRepository userRepository, LoanRepository loanRepository) {
         this.userRepository = userRepository;
-        this.modelMapper = modelMapper;
         this.loanRepository = loanRepository;
     }
 
@@ -40,19 +37,17 @@ public class UserService {
 
     public List<UserDTO> findAll() {
         List<User> users = userRepository.findAll();
-        return users.stream()
-                .map(user -> modelMapper.map(user, UserDTO.class))
-                .collect(Collectors.toList());
+        return UserMapper.toDTOList(users);
     }
 
     public UserDTO findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return modelMapper.map(user, UserDTO.class);
+        return UserMapper.toDTO(user);
     }
 
     public UserDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
-        return  modelMapper.map(user, UserDTO.class);
+        return UserMapper.toDTO(user);
     }
 
 
@@ -79,7 +74,5 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public UserDTO convertToDTO(User user) {
-        return modelMapper.map(user, UserDTO.class);
-    }
+
 }
