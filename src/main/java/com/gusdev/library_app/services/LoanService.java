@@ -6,7 +6,6 @@ import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
 import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.utils.LoanMapper;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

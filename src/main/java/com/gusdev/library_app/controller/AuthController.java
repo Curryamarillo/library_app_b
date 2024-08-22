@@ -30,22 +30,4 @@ public class AuthController {
         return new ResponseEntity<>(this.userDetailService.loginUser(loginRequestDTO), HttpStatus.OK);
     }
 
-//    @Autowired
-//    private final AuthService authService;
-//
-//    public AuthController(AuthService authService) {
-//        this.authService = authService;
-//    }
-//
-//    @CrossOrigin
-//    @PostMapping("/login")
-//    public ResponseEntity<?> authenticateUser(@RequestBody LoginRequestDTO loginRequest){
-//        LoginResponseDTO userResponseDTO = authService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
-//
-//        if (userResponseDTO != null) {
-//            return ResponseEntity.ok(userResponseDTO);
-//        } else {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email or password incorrect");
-//        }
-//    }
 }

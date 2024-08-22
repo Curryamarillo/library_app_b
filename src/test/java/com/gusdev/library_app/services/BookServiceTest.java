@@ -2,23 +2,22 @@ package com.gusdev.library_app.services;
 
 import com.gusdev.library_app.dtoRequest.BookDTO;
 import com.gusdev.library_app.entities.Book;
+import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.repositories.BookRepository;
-import com.gusdev.library_app.utils.BookMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
 
 
-import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,28 +29,33 @@ class BookServiceTest {
     @Mock
     private BookRepository bookRepository;
 
-    @Mock
-    private ModelMapper modelMapper;
-
     @InjectMocks
     private BookService bookService;
 
     private Book book1;
+    private Book book2;
     private BookDTO bookDTO1;
-
+    private BookDTO bookDTO2;
     @BeforeEach
     void setUp() {
+        book1 = new Book();
+        book1.setId(1L);
+        book1.setTitle("Book One");
+        book1.setAuthor("Author One");
+        book1.setIsAvailable(true);
+        book1.setIsbn("12345");
+        book1.setLoans(Set.of(new Loan()));
 
-        book1 = Book.builder()
-                .id(1L)
-                .title("Book One")
-                .author("Author One")
-                .isbn("12345")
-                .isAvailable(true)
-                .createdDate(LocalDateTime.now())
-                .build();
+        book2 = new Book();
+        book2.setId(2L);
+        book2.setTitle("Book Two");
+        book2.setAuthor("Author Two");
+        book2.setIsAvailable(false);
+        book2.setIsbn("67890");
+        book2.setLoans(Set.of(new Loan()));
 
-        bookDTO1 = new BookDTO(1L,"Book One","Author One","12345",true);
+        bookDTO1 = new BookDTO(1L, "Book One", "Author One", "12345", true);
+        bookDTO2 = new BookDTO(2L, "Book Two", "Author Two", "67890", false);
     }
     @Test
     void createBookTest() {
@@ -179,7 +183,7 @@ class BookServiceTest {
     void findByIdTest() {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
-        given(modelMapper.map(book1, BookDTO.class)).willReturn(bookDTO1);
+
         // when
         Optional<BookDTO> foundBook = bookService.findById(book1.getId());
 
@@ -187,7 +191,6 @@ class BookServiceTest {
         assertTrue(foundBook.isPresent());
         assertEquals(bookDTO1.title(), foundBook.get().title());
         verify(bookRepository).findById(book1.getId());
-        verify(modelMapper).map(book1, BookDTO.class);
     }
 
     @Test
