@@ -1,9 +1,8 @@
 package com.gusdev.library_app.utils;
 
-import com.gusdev.library_app.dtoResponse.UserDTO;
+import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
-import com.gusdev.library_app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -42,13 +41,13 @@ class UserMapperTest {
     @Test
     void toDTO() {
         // when
-        UserDTO userDTO = UserMapper.toDTO(user1);
+        UserResponseDTO userResponseDTO = UserMapper.toDTO(user1);
         // then
-        assertNotNull(userDTO);
-        assertEquals(user1.getId(), userDTO.id());
-        assertEquals(user1.getName(), userDTO.name());
-        assertEquals(user1.getSurname(), userDTO.surname());
-        assertEquals(user1.getIsAdmin(), userDTO.isAdmin());
+        assertNotNull(userResponseDTO);
+        assertEquals(user1.getId(), userResponseDTO.id());
+        assertEquals(user1.getName(), userResponseDTO.name());
+        assertEquals(user1.getSurname(), userResponseDTO.surname());
+        assertEquals(user1.getIsAdmin(), userResponseDTO.isAdmin());
 
     }
 
@@ -59,19 +58,19 @@ class UserMapperTest {
         userList.add(user1);
         userList.add(user2);
 
-        List<UserDTO> userDTOList = UserMapper.toDTOList(userList);
+        List<UserResponseDTO> userResponseDTOList = UserMapper.toDTOList(userList);
 
-        assertNotNull(userDTOList);
+        assertNotNull(userResponseDTOList);
         assertEquals(2, userList.size());
 
-        UserDTO dto1 = userDTOList.getFirst();
+        UserResponseDTO dto1 = userResponseDTOList.getFirst();
         assertEquals(user1.getId(), dto1.id());
         assertEquals(user1.getName(), dto1.name());
         assertEquals(user1.getSurname(), dto1.surname());
         assertEquals(user1.getEmail(), dto1.email());
         assertEquals(user1.getIsAdmin(), dto1.isAdmin());
 
-        UserDTO dto2 = userDTOList.get(1);
+        UserResponseDTO dto2 = userResponseDTOList.get(1);
         assertEquals(user2.getId(), dto2.id());
         assertEquals(user2.getName(), dto2.name());
         assertEquals(user2.getSurname(), dto2.surname());

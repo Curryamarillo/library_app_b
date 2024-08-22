@@ -1,6 +1,6 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.dtoRequest.BookDTO;
+import com.gusdev.library_app.dtoRequest.BookRequestDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
@@ -61,16 +61,16 @@ public class BookService {
     }
 
 
-    public Optional<BookDTO> findById(Long id) {
+    public Optional<BookRequestDTO> findById(Long id) {
         return bookRepository.findById(id)
                 .map(BookMapper::toDto);
     }
 
-    public void update(Long id, BookDTO bookDTO) {
+    public void update(Long id, BookRequestDTO bookRequestDTO) {
         Book existingBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
-        existingBook.setAuthor(bookDTO.author());
-        existingBook.setIsbn(bookDTO.isbn());
-        existingBook.setTitle(bookDTO.title());
+        existingBook.setAuthor(bookRequestDTO.author());
+        existingBook.setIsbn(bookRequestDTO.isbn());
+        existingBook.setTitle(bookRequestDTO.title());
         bookRepository.save(existingBook);
     }
 

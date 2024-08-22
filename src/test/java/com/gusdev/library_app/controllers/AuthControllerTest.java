@@ -1,12 +1,11 @@
 package com.gusdev.library_app.controllers;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gusdev.library_app.config.security.JwtUtils;
 import com.gusdev.library_app.config.security.UserDetailServiceImpl;
 import com.gusdev.library_app.controller.AuthController;
-import com.gusdev.library_app.dtoRequest.CreateUserRequestDTO;
+import com.gusdev.library_app.dtoRequest.UserCreateRequestDTO;
 import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,11 +52,11 @@ public class AuthControllerTest {
 
   private LoginRequestDTO loginRequestDTO;
   private AuthResponseDTO authResponseDTO;
-  private CreateUserRequestDTO createUserRequestDTO;
+  private UserCreateRequestDTO userCreateRequestDTO;
 
    @BeforeEach
    void setUp() {
-       createUserRequestDTO = new CreateUserRequestDTO("UserOne", "UserSurnameOne", "email@email.com", true, "password123");
+       userCreateRequestDTO = new UserCreateRequestDTO("UserOne", "UserSurnameOne", "email@email.com", true, "password123");
        loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
        authResponseDTO = new AuthResponseDTO("test@example.com", "", true, true, "", true);
     }
@@ -70,11 +69,11 @@ public class AuthControllerTest {
 
     @Test
     void UserRegisterSuccessful() throws Exception {
-       String token = generateJwtToken(); when(userDetailService.createUser(any(CreateUserRequestDTO.class))).thenReturn(authResponseDTO);
+       String token = generateJwtToken(); when(userDetailService.createUser(any(UserCreateRequestDTO.class))).thenReturn(authResponseDTO);
 
         mockMvc.perform(post("/api/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createUserRequestDTO)))
+                        .content(objectMapper.writeValueAsString(userCreateRequestDTO)))
                 .andExpect(status().isCreated());
     }
     @Test

@@ -3,7 +3,7 @@ package com.gusdev.library_app.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gusdev.library_app.config.security.JwtUtils;
 import com.gusdev.library_app.controller.UserController;
-import com.gusdev.library_app.dtoResponse.UserDTO;
+import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
@@ -53,8 +53,8 @@ public class UserControllerTests {
 
     private User user1;
     private User user2;
-    private UserDTO userDTO1;
-    private UserDTO userDTO2;
+    private UserResponseDTO userResponseDTO1;
+    private UserResponseDTO userResponseDTO2;
 
     @BeforeEach
     void setUp() {
@@ -77,8 +77,8 @@ public class UserControllerTests {
         user2.setLoans(Set.of(new Loan()));
         user2.setPassword("password456");
 
-        userDTO1 = new UserDTO(1L, "User One", "Surname One", "emailOne@test.com", true);
-        userDTO2 = new UserDTO(2L, "User Two", "Surname Two", "emailTwo@test.com", false);
+        userResponseDTO1 = new UserResponseDTO(1L, "User One", "Surname One", "emailOne@test.com", true);
+        userResponseDTO2 = new UserResponseDTO(2L, "User Two", "Surname Two", "emailTwo@test.com", false);
     }
 
     private String generateJwtToken() {
@@ -96,21 +96,21 @@ public class UserControllerTests {
         ResultActions result = mockMvc.perform(post("/users/create")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO1)));
+                .content(objectMapper.writeValueAsString(userResponseDTO1)));
 
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userDTO1.id()))
-                .andExpect(jsonPath("$.name").value(userDTO1.name()))
-                .andExpect(jsonPath("$.surname").value(userDTO1.surname()))
-                .andExpect(jsonPath("$.email").value(userDTO1.email()));
+                .andExpect(jsonPath("$.id").value(userResponseDTO1.id()))
+                .andExpect(jsonPath("$.name").value(userResponseDTO1.name()))
+                .andExpect(jsonPath("$.surname").value(userResponseDTO1.surname()))
+                .andExpect(jsonPath("$.email").value(userResponseDTO1.email()));
     }
 
     @Test
     void findAllUsers_Success() throws Exception {
         String token = generateJwtToken();
 
-        List<UserDTO> userList = List.of(userDTO1, userDTO2);
+        List<UserResponseDTO> userList = List.of(userResponseDTO1, userResponseDTO2);
 
         given(userService.findAll()).willReturn(userList);
 
@@ -120,31 +120,31 @@ public class UserControllerTests {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].id").value(userDTO1.id()))
-                .andExpect(jsonPath("$[0].name").value(userDTO1.name()))
-                .andExpect(jsonPath("$[0].surname").value(userDTO1.surname()))
-                .andExpect(jsonPath("$[0].email").value(userDTO1.email()))
-                .andExpect(jsonPath("$[1].id").value(userDTO2.id()))
-                .andExpect(jsonPath("$[1].name").value(userDTO2.name()))
-                .andExpect(jsonPath("$[1].surname").value(userDTO2.surname()))
-                .andExpect(jsonPath("$[1].email").value(userDTO2.email()));
+                .andExpect(jsonPath("$[0].id").value(userResponseDTO1.id()))
+                .andExpect(jsonPath("$[0].name").value(userResponseDTO1.name()))
+                .andExpect(jsonPath("$[0].surname").value(userResponseDTO1.surname()))
+                .andExpect(jsonPath("$[0].email").value(userResponseDTO1.email()))
+                .andExpect(jsonPath("$[1].id").value(userResponseDTO2.id()))
+                .andExpect(jsonPath("$[1].name").value(userResponseDTO2.name()))
+                .andExpect(jsonPath("$[1].surname").value(userResponseDTO2.surname()))
+                .andExpect(jsonPath("$[1].email").value(userResponseDTO2.email()));
     }
 
     @Test
     void findUserById_Success() throws Exception {
         String token = generateJwtToken();
 
-        given(userService.findById(1L)).willReturn(userDTO1);
+        given(userService.findById(1L)).willReturn(userResponseDTO1);
 
         ResultActions result = mockMvc.perform(get("/users/{id}", 1L)
                 .header("Authorization", token));
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userDTO1.id()))
-                .andExpect(jsonPath("$.name").value(userDTO1.name()))
-                .andExpect(jsonPath("$.surname").value(userDTO1.surname()))
-                .andExpect(jsonPath("$.email").value(userDTO1.email()));
+                .andExpect(jsonPath("$.id").value(userResponseDTO1.id()))
+                .andExpect(jsonPath("$.name").value(userResponseDTO1.name()))
+                .andExpect(jsonPath("$.surname").value(userResponseDTO1.surname()))
+                .andExpect(jsonPath("$.email").value(userResponseDTO1.email()));
     }
 
     @Test
@@ -164,17 +164,17 @@ public class UserControllerTests {
         String token = generateJwtToken();
 
         String user1Email = user1.getEmail();
-        given(userService.findByEmail(user1Email)).willReturn(userDTO1);
+        given(userService.findByEmail(user1Email)).willReturn(userResponseDTO1);
 
         ResultActions result = mockMvc.perform(get("/users/email/{email}", user1Email)
                 .header("Authorization", token));
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userDTO1.id()))
-                .andExpect(jsonPath("$.name").value(userDTO1.name()))
-                .andExpect(jsonPath("$.surname").value(userDTO1.surname()))
-                .andExpect(jsonPath("$.email").value(userDTO1.email()));
+                .andExpect(jsonPath("$.id").value(userResponseDTO1.id()))
+                .andExpect(jsonPath("$.name").value(userResponseDTO1.name()))
+                .andExpect(jsonPath("$.surname").value(userResponseDTO1.surname()))
+                .andExpect(jsonPath("$.email").value(userResponseDTO1.email()));
     }
 
     @Test
@@ -195,19 +195,19 @@ public class UserControllerTests {
         String token = generateJwtToken();
 
         doNothing().when(userService).update(1L, user1);
-        given(userService.findById(1L)).willReturn(userDTO1);
+        given(userService.findById(1L)).willReturn(userResponseDTO1);
 
         ResultActions result = mockMvc.perform(put("/users/{id}", 1L)
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO1)));
+                .content(objectMapper.writeValueAsString(userResponseDTO1)));
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userDTO1.id()))
-                .andExpect(jsonPath("$.name").value(userDTO1.name()))
-                .andExpect(jsonPath("$.surname").value(userDTO1.surname()))
-                .andExpect(jsonPath("$.email").value(userDTO1.email()));
+                .andExpect(jsonPath("$.id").value(userResponseDTO1.id()))
+                .andExpect(jsonPath("$.name").value(userResponseDTO1.name()))
+                .andExpect(jsonPath("$.surname").value(userResponseDTO1.surname()))
+                .andExpect(jsonPath("$.email").value(userResponseDTO1.email()));
     }
 
     @Test
@@ -219,7 +219,7 @@ public class UserControllerTests {
         ResultActions result = mockMvc.perform(put("/users/{id}", 2L)
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userDTO2)));
+                .content(objectMapper.writeValueAsString(userResponseDTO2)));
 
         result.andExpect(status().isOk());
     }

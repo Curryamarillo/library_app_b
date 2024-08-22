@@ -2,7 +2,7 @@ package com.gusdev.library_app.secutity;
 
 import com.gusdev.library_app.config.security.JwtUtils;
 import com.gusdev.library_app.config.security.UserDetailServiceImpl;
-import com.gusdev.library_app.dtoRequest.CreateUserRequestDTO;
+import com.gusdev.library_app.dtoRequest.UserCreateRequestDTO;
 import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
 import com.gusdev.library_app.entities.User;
@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -76,12 +75,12 @@ public class UserDetailServiceImplTests {
     @Test
     void createUser_Success_ReturnAuthResponseDTO() {
         // given
-        CreateUserRequestDTO createUserRequestDTO = new CreateUserRequestDTO("Doe", "John", email, false, password);
+        UserCreateRequestDTO userCreateRequestDTO = new UserCreateRequestDTO("Doe", "John", email, false, password);
         given(userRepository.save(any(User.class))).willReturn(user);
         given(jwtUtils.createToken(any(Authentication.class))).willReturn("dummyToken");
 
         // when
-        AuthResponseDTO responseDTO = userDetailService.createUser(createUserRequestDTO);
+        AuthResponseDTO responseDTO = userDetailService.createUser(userCreateRequestDTO);
 
         // then
         assertNotNull(responseDTO);

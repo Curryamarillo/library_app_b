@@ -5,10 +5,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 
 import java.time.LocalDateTime;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class BookRepositoryTests {
@@ -16,13 +17,15 @@ public class BookRepositoryTests {
     @Autowired
     private BookRepository bookRepository;
 
+    @Autowired
+    private TestEntityManager entityManager;
+
     private Book book1;
     private Book book2;
 
     @BeforeEach
     public void setUpTest() {
         book1 = Book.builder()
-                .id(1L)
                 .title("Book One")
                 .author("Author One")
                 .isbn("1234")
@@ -38,8 +41,10 @@ public class BookRepositoryTests {
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        bookRepository.save(book1);
-        bookRepository.save(book2);
+        // Persistir las entidades
+        entityManager.persist(book1);
+        entityManager.persist(book2);
+        entityManager.flush();
     }
 
     @Test
@@ -54,7 +59,7 @@ public class BookRepositoryTests {
                 .build();
 
         // when
-        Book savedBook = bookRepository.save(book3);
+        Book savedBook = entityManager.persistAndFlush(book3);
 
         // then
         assertThat(savedBook).isNotNull();
@@ -110,22 +115,26 @@ public class BookRepositoryTests {
                 .isAvailable(true)
                 .createdDate(LocalDateTime.now())
                 .build();
-        bookRepository.save(newBook);
+        entityManager.persistAndFlush(newBook);
         assertThat(bookRepository.existsByTitle("New Book")).isTrue();
 
         // Read
-        Book foundBook = bookRepository.findById(newBook.getId()).orElse(null);
+        Book foundBook = entityManager.find(Book.class, newBook.getId());
         assertThat(foundBook).isNotNull();
         assertThat(foundBook.getTitle()).isEqualTo("New Book");
 
         // Update
         foundBook.setTitle("Updated Book");
-        bookRepository.save(foundBook);
-        Book updatedBook = bookRepository.findById(foundBook.getId()).orElse(null);
+        entityManager.merge(foundBook);
+        entityManager.flush();
+
+        Book updatedBook = entityManager.find(Book.class, foundBook.getId());
+        assertThat(updatedBook).isNotNull();
         assertThat(updatedBook.getTitle()).isEqualTo("Updated Book");
 
         // Delete
-        bookRepository.delete(updatedBook);
+        entityManager.remove(updatedBook);
+        entityManager.flush();
         assertThat(bookRepository.existsByTitle("Updated Book")).isFalse();
     }
 }

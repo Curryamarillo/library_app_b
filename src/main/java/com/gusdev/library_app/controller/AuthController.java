@@ -1,7 +1,7 @@
 package com.gusdev.library_app.controller;
 
 import com.gusdev.library_app.config.security.UserDetailServiceImpl;
-import com.gusdev.library_app.dtoRequest.CreateUserRequestDTO;
+import com.gusdev.library_app.dtoRequest.UserCreateRequestDTO;
 import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class AuthController {
     private UserDetailServiceImpl userDetailService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid CreateUserRequestDTO userRequestDTO) {
+    public ResponseEntity<AuthResponseDTO> register(@RequestBody @Valid UserCreateRequestDTO userRequestDTO) {
 
         return new ResponseEntity<>(this.userDetailService.createUser(userRequestDTO), HttpStatus.CREATED);
     }

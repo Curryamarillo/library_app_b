@@ -1,11 +1,11 @@
 package com.gusdev.library_app.utils;
 
-import com.gusdev.library_app.dtoRequest.BookDTO;
+import com.gusdev.library_app.dtoRequest.BookRequestDTO;
 import com.gusdev.library_app.entities.Book;
 
 public class BookMapper {
-    public static BookDTO toDto(Book book) {
-        return new BookDTO(
+    public static BookRequestDTO toDto(Book book) {
+        return new BookRequestDTO(
                 book.getId(),
                 book.getTitle(),
                 book.getAuthor(),

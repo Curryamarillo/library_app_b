@@ -1,6 +1,6 @@
 package com.gusdev.library_app.config.security;
 
-import com.gusdev.library_app.dtoRequest.CreateUserRequestDTO;
+import com.gusdev.library_app.dtoRequest.UserCreateRequestDTO;
 import com.gusdev.library_app.dtoRequest.LoginRequestDTO;
 import com.gusdev.library_app.dtoResponse.AuthResponseDTO;
 import com.gusdev.library_app.entities.User;
@@ -20,7 +20,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class UserDetailServiceImpl implements UserDetailsService {
@@ -40,7 +39,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
 
         }
-        public AuthResponseDTO createUser(@NotNull CreateUserRequestDTO createUserRequest) {
+        public AuthResponseDTO createUser(@NotNull UserCreateRequestDTO createUserRequest) {
         String email = createUserRequest.email();
         String name = createUserRequest.name();
         String surname = createUserRequest.surname();

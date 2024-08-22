@@ -1,6 +1,6 @@
 package com.gusdev.library_app.controller;
 
-import com.gusdev.library_app.dtoRequest.BookDTO;
+import com.gusdev.library_app.dtoRequest.BookRequestDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.services.BookService;
@@ -32,12 +32,12 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDTO>> findAll() {
+    public ResponseEntity<List<BookRequestDTO>> findAll() {
         List<Book> bookList = bookService.findAll();
-        List<BookDTO> bookDTOList = bookList.stream()
+        List<BookRequestDTO> bookRequestDTOList = bookList.stream()
                 .map(BookMapper::toDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(bookDTOList);
+        return ResponseEntity.ok(bookRequestDTOList);
     }
 
     @GetMapping("/title/{title}")
@@ -46,18 +46,18 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
     @GetMapping("/title/v2/{title}")
-    public ResponseEntity<List<BookDTO>> findByTitleIgnoreCase(@PathVariable String title) {
+    public ResponseEntity<List<BookRequestDTO>> findByTitleIgnoreCase(@PathVariable String title) {
         List<Book> books = bookService.findByTitleContainingIgnoreCase(title);
-        List<BookDTO> bookDTOList = books.stream()
+        List<BookRequestDTO> bookRequestDTOList = books.stream()
                 .map(BookMapper::toDto)
                 .toList();
-        return ResponseEntity.ok(bookDTOList);
+        return ResponseEntity.ok(bookRequestDTOList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookDTO> findById(@PathVariable Long id) {
-        BookDTO bookDTO = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
-        return ResponseEntity.ok(bookDTO);
+    public ResponseEntity<BookRequestDTO> findById(@PathVariable Long id) {
+        BookRequestDTO bookRequestDTO = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+        return ResponseEntity.ok(bookRequestDTO);
     }
 
     @GetMapping("/author/{author}")
@@ -68,10 +68,10 @@ public class BookController {
 
     @CrossOrigin
     @PutMapping("/{id}")
-    public ResponseEntity<BookDTO> updateBook(@PathVariable Long id, @RequestBody BookDTO bookDTO) {
+    public ResponseEntity<BookRequestDTO> updateBook(@PathVariable Long id, @RequestBody BookRequestDTO bookRequestDTO) {
         try {
-            bookService.update(id, bookDTO);
-            return ResponseEntity.ok(bookDTO);
+            bookService.update(id, bookRequestDTO);
+            return ResponseEntity.ok(bookRequestDTO);
         } catch (BookNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

@@ -1,6 +1,6 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.dtoRequest.BookDTO;
+import com.gusdev.library_app.dtoRequest.BookRequestDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
@@ -34,8 +34,8 @@ class BookServiceTest {
 
     private Book book1;
     private Book book2;
-    private BookDTO bookDTO1;
-    private BookDTO bookDTO2;
+    private BookRequestDTO bookRequestDTO1;
+    private BookRequestDTO bookRequestDTO2;
     @BeforeEach
     void setUp() {
         book1 = new Book();
@@ -54,8 +54,8 @@ class BookServiceTest {
         book2.setIsbn("67890");
         book2.setLoans(Set.of(new Loan()));
 
-        bookDTO1 = new BookDTO(1L, "Book One", "Author One", "12345", true);
-        bookDTO2 = new BookDTO(2L, "Book Two", "Author Two", "67890", false);
+        bookRequestDTO1 = new BookRequestDTO(1L, "Book One", "Author One", "12345", true);
+        bookRequestDTO2 = new BookRequestDTO(2L, "Book Two", "Author Two", "67890", false);
     }
     @Test
     void createBookTest() {
@@ -185,11 +185,11 @@ class BookServiceTest {
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
         // when
-        Optional<BookDTO> foundBook = bookService.findById(book1.getId());
+        Optional<BookRequestDTO> foundBook = bookService.findById(book1.getId());
 
         // then
         assertTrue(foundBook.isPresent());
-        assertEquals(bookDTO1.title(), foundBook.get().title());
+        assertEquals(bookRequestDTO1.title(), foundBook.get().title());
         verify(bookRepository).findById(book1.getId());
     }
 
@@ -200,7 +200,7 @@ class BookServiceTest {
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
 
         // when
-        Optional<BookDTO> foundBook = bookService.findById(nonExistingId);
+        Optional<BookRequestDTO> foundBook = bookService.findById(nonExistingId);
 
         // then
         assertFalse(foundBook.isPresent());
@@ -214,7 +214,7 @@ class BookServiceTest {
 
 
         // when
-        bookService.update(book1.getId(), bookDTO1);
+        bookService.update(book1.getId(), bookRequestDTO1);
 
         // then
         verify(bookRepository).findById(book1.getId());
@@ -228,7 +228,7 @@ class BookServiceTest {
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
 
         // when & then
-        assertThrows(BookNotFoundException.class, () -> bookService.update(nonExistingId, bookDTO1));
+        assertThrows(BookNotFoundException.class, () -> bookService.update(nonExistingId, bookRequestDTO1));
         verify(bookRepository).findById(nonExistingId);
         verify(bookRepository, never()).save(any());
     }

@@ -40,7 +40,7 @@ public class Book {
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", fetch = FetchType.EAGER)
     private Set<Loan> loans = new HashSet<>();
 
 }

@@ -1,6 +1,7 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.dtoResponse.LoanDTO;
+import com.gusdev.library_app.dtoRequest.LoanRequestDTO;
+import com.gusdev.library_app.dtoResponse.LoanResponseDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
@@ -37,8 +38,11 @@ class LoanServiceTest {
 
     private Loan loan1;
     private Loan loan2;
-    private LoanDTO loanDTO1;
-    private LoanDTO loanDTO2;
+    private LoanRequestDTO loanRequestDTO1;
+    private LoanRequestDTO loanRequestDTO2;
+    private LoanResponseDTO loanResponseDTO1;
+    private LoanResponseDTO loanResponseDTO2;
+
 
     private User user1;
     private User user2;
@@ -107,9 +111,13 @@ class LoanServiceTest {
                 .build();
 
         // Instancia de entidades LoanDTO
-        loanDTO1 = new LoanDTO(1l, user1.getId(), book1.getId(), loan1.getLoanDate(),loan1.getReturnDate());
 
-        loanDTO2 = new LoanDTO(2L, user2.getId(), book2.getId(), loan2.getLoanDate(), loan2.getReturnDate());
+        loanRequestDTO1 = new LoanRequestDTO(user1.getId(), book1.getId());
+        loanRequestDTO2 = new LoanRequestDTO(user2.getId(), user2.getId());
+
+        loanResponseDTO1 = new LoanResponseDTO(1l, user1.getId(), book1.getId(), loan1.getLoanDate(),loan1.getReturnDate());
+        loanResponseDTO2 = new LoanResponseDTO(2L, user2.getId(), book2.getId(), loan2.getLoanDate(), loan2.getReturnDate());
+
 
     }
 
@@ -120,7 +128,7 @@ class LoanServiceTest {
         given(loanRepository.save(any(Loan.class))).willReturn(loan1);
 
         // When
-        Loan createdLoan = loanService.create(loan1);
+        Loan createdLoan = loanService.create(loanRequestDTO1);
 
         // Then
         assertNotNull(createdLoan);
@@ -134,7 +142,7 @@ class LoanServiceTest {
         loan1.getBook().setIsAvailable(false);
 
         // When & Then
-        assertThrows(LoanAlreadyExistsException.class, () -> loanService.create(loan1));
+        assertThrows(LoanAlreadyExistsException.class, () -> loanService.create(loanRequestDTO1));
     }
 
     @Test
@@ -144,25 +152,25 @@ class LoanServiceTest {
         given(loanRepository.findAll()).willReturn(loans);
 
         // When
-        List<LoanDTO> loanDTOList = loanService.findAll();
+        List<LoanResponseDTO> loanResponseDTOList = loanService.findAll();
 
         // Then
-        assertEquals(2, loanDTOList.size());
-        assertNotNull(loanDTOList);
+        assertEquals(2, loanResponseDTOList.size());
+        assertNotNull(loanResponseDTOList);
 
-        LoanDTO fetchedLoanDTO1 = loanDTOList.get(0);
-        assertEquals(loan1.getId(), fetchedLoanDTO1.id());
-        assertEquals(loan1.getUser().getId(), fetchedLoanDTO1.userId());
-        assertEquals(loan1.getBook().getId(), fetchedLoanDTO1.bookId());
-        assertEquals(loan1.getLoanDate(), fetchedLoanDTO1.loanDate());
-        assertEquals(loan1.getReturnDate(), fetchedLoanDTO1.returnDate());
+        LoanResponseDTO fetchedLoanResponseDTO1 = loanResponseDTOList.get(0);
+        assertEquals(loan1.getId(), fetchedLoanResponseDTO1.id());
+        assertEquals(loan1.getUser().getId(), fetchedLoanResponseDTO1.userId());
+        assertEquals(loan1.getBook().getId(), fetchedLoanResponseDTO1.bookId());
+        assertEquals(loan1.getLoanDate(), fetchedLoanResponseDTO1.loanDate());
+        assertEquals(loan1.getReturnDate(), fetchedLoanResponseDTO1.returnDate());
 
-        LoanDTO fetchedLoanDTO2 = loanDTOList.get(1);
-        assertEquals(loan2.getId(), fetchedLoanDTO2.id());
-        assertEquals(loan2.getUser().getId(), fetchedLoanDTO2.userId());
-        assertEquals(loan2.getBook().getId(), fetchedLoanDTO2.bookId());
-        assertEquals(loan2.getLoanDate(), fetchedLoanDTO2.loanDate());
-        assertEquals(loan2.getReturnDate(), fetchedLoanDTO2.returnDate());
+        LoanResponseDTO fetchedLoanResponseDTO2 = loanResponseDTOList.get(1);
+        assertEquals(loan2.getId(), fetchedLoanResponseDTO2.id());
+        assertEquals(loan2.getUser().getId(), fetchedLoanResponseDTO2.userId());
+        assertEquals(loan2.getBook().getId(), fetchedLoanResponseDTO2.bookId());
+        assertEquals(loan2.getLoanDate(), fetchedLoanResponseDTO2.loanDate());
+        assertEquals(loan2.getReturnDate(), fetchedLoanResponseDTO2.returnDate());
     }
 
     @Test
@@ -171,15 +179,15 @@ class LoanServiceTest {
         given(loanRepository.findById(anyLong())).willReturn(Optional.of(loan1));
 
         // When
-        LoanDTO foundLoanDTO = loanService.findById(1L);
+        LoanResponseDTO foundLoanResponseDTO = loanService.findById(1L);
 
         // Then
-        assertNotNull(foundLoanDTO);
-        assertEquals(loanDTO1.id(), foundLoanDTO.id());
-        assertEquals(loanDTO1.userId(), foundLoanDTO.userId());
-        assertEquals(loanDTO1.bookId(), foundLoanDTO.bookId());
-        assertEquals(loanDTO1.loanDate(), foundLoanDTO.loanDate());
-        assertEquals(loanDTO1.returnDate(), foundLoanDTO.returnDate());
+        assertNotNull(foundLoanResponseDTO);
+        assertEquals(loanResponseDTO1.id(), foundLoanResponseDTO.id());
+        assertEquals(loanResponseDTO1.userId(), foundLoanResponseDTO.userId());
+        assertEquals(loanResponseDTO1.bookId(), foundLoanResponseDTO.bookId());
+        assertEquals(loanResponseDTO1.loanDate(), foundLoanResponseDTO.loanDate());
+        assertEquals(loanResponseDTO1.returnDate(), foundLoanResponseDTO.returnDate());
     }
 
     @Test

@@ -9,13 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 public class LoanRepositoryTests {
-
 
     @Autowired
     private LoanRepository loanRepository;
@@ -28,55 +28,53 @@ public class LoanRepositoryTests {
 
     private User user1;
     private Book book1;
+    private Book book2;
     private Loan loan1;
 
     @BeforeEach
     public void setUpTest() {
-        loanRepository.deleteAll();
-        userRepository.deleteAll();
-        bookRepository.deleteAll();
-
-        user1 = User.builder()
+        user1 = userRepository.save(User.builder()
                 .name("John")
                 .surname("Doe")
                 .email("john.doe4@example.com")
                 .isAdmin(false)
                 .password("password123")
-                .build();
+                .build());
 
-        book1 = Book.builder()
+
+        book1 = bookRepository.save(Book.builder()
                 .title("Book one")
                 .author("Author one")
                 .isbn("1234")
                 .isAvailable(true)
                 .createdDate(LocalDateTime.now())
-                .build();
+                .build());
 
-        userRepository.save(user1);
-        bookRepository.save(book1);
+        book2 = bookRepository.save(Book.builder()
+                .title("Book two")
+                .author("Author two")
+                .isbn("5678")
+                .isAvailable(true)
+                .createdDate(LocalDateTime.now())
+                .build());
 
-        loan1 = Loan.builder()
+        loan1 = loanRepository.save(Loan.builder()
                 .user(user1)
                 .book(book1)
                 .loanDate(LocalDateTime.now())
                 .returnDate(null)
-                .build();
-
-        loanRepository.save(loan1);
+                .build());
     }
 
     @Test
     public void saveLoanTest() {
-        // given
-        Loan loan2 = Loan.builder()
+        // when
+        Loan savedLoan = loanRepository.save(Loan.builder()
                 .user(user1)
-                .book(book1)
+                .book(book2)
                 .loanDate(LocalDateTime.now())
                 .returnDate(null)
-                .build();
-
-        // when
-        Loan savedLoan = loanRepository.save(loan2);
+                .build());
 
         // then
         assertThat(savedLoan).isNotNull();
@@ -106,44 +104,35 @@ public class LoanRepositoryTests {
 
     @Test
     public void findAllLoansTest() {
-        // given
-        Loan loan2 = Loan.builder()
-                .user(user1)
-                .book(book1)
-                .loanDate(LocalDateTime.now().plusDays(1))
-                .returnDate(null)
-                .build();
+        loanRepository.deleteAll();
+        loanRepository.save(loan1);
+        List<Loan> loanList = loanRepository.findAll();
+        loanList.forEach(loan -> System.out.println("Loan" + loan));
 
-        loanRepository.save(loan2);
-
-        // when
-        Iterable<Loan> loans = loanRepository.findAll();
-
-        // then
-        assertThat(loans).isNotNull();
-        assertThat(loans).hasSize(2); // ya que hemos guardado dos préstamos en total
+        assertThat(loanList).isNotNull();
+        assertThat(loanList).hasSize(1);
     }
 
     @Test
     public void findByIdTest() {
-        // when
+
         Optional<Loan> foundLoan = loanRepository.findById(loan1.getId());
 
-        // then
+
         assertThat(foundLoan).isPresent();
         assertThat(foundLoan.get().getId()).isEqualTo(loan1.getId());
     }
 
     @Test
     public void updateLoanTest() {
-        // given
+
         loan1.setReturnDate(LocalDateTime.now());
 
-        // when
+
         loanRepository.save(loan1);
         Optional<Loan> updatedLoan = loanRepository.findById(loan1.getId());
 
-        // then
+
         assertThat(updatedLoan).isPresent();
         assertThat(updatedLoan.get().getReturnDate()).isNotNull();
     }

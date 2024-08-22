@@ -1,6 +1,6 @@
 package com.gusdev.library_app.controller;
 
-import com.gusdev.library_app.dtoResponse.UserDTO;
+import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
 import com.gusdev.library_app.exceptions.UserNotFoundException;
@@ -25,40 +25,40 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<UserDTO> createUser(@RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody User user) {
         User createdUser = userService.create(user);
-        UserDTO createdUserDTO = new UserDTO(
+        UserResponseDTO createdUserResponseDTO = new UserResponseDTO(
                 createdUser.getId(),
                 createdUser.getName(),
                 createdUser.getSurname(),
                 createdUser.getEmail(),
                 createdUser.getIsAdmin()
         );
-        return new ResponseEntity<>(createdUserDTO, HttpStatus.CREATED);
+        return new ResponseEntity<>(createdUserResponseDTO, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll() {
-        List<UserDTO> usersList = userService.findAll();
+    public ResponseEntity<List<UserResponseDTO>> findAll() {
+        List<UserResponseDTO> usersList = userService.findAll();
         return ResponseEntity.ok(usersList);
     }
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
         try {
-            UserDTO userDTO = userService.findById(id);
-            return ResponseEntity.ok(userDTO);
+            UserResponseDTO userResponseDTO = userService.findById(id);
+            return ResponseEntity.ok(userResponseDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/email/{email}")
-    public ResponseEntity<UserDTO> findByEmail(@PathVariable String email) {
+    public ResponseEntity<UserResponseDTO> findByEmail(@PathVariable String email) {
         try {
-            UserDTO userDTO = userService.findByEmail(email);
-            return ResponseEntity.ok(userDTO);
+            UserResponseDTO userResponseDTO = userService.findByEmail(email);
+            return ResponseEntity.ok(userResponseDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -66,10 +66,10 @@ public class UserController {
 
     @CrossOrigin
     @PutMapping("/{id}")
-    public ResponseEntity<UserDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
+    public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
             userService.update(id, user);
-            UserDTO updatedUser = userService.findById(id);
+            UserResponseDTO updatedUser = userService.findById(id);
             return ResponseEntity.ok(updatedUser);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();

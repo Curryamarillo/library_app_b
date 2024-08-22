@@ -1,12 +1,7 @@
 package com.gusdev.library_app.dtoRequest;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-
-public record BookDTO(
+public record BookRequestDTO(
         Long id,
         String title,
         String author,

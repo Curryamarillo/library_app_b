@@ -43,7 +43,7 @@ public class User implements UserDetails {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<Loan> loans = new HashSet<>();
 
     @Override

@@ -1,6 +1,6 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.dtoResponse.UserDTO;
+import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
@@ -44,8 +44,8 @@ class UserServiceTest {
 
     private User user1;
     private User user2;
-    private UserDTO userDTO1;
-    private UserDTO userDTO2;
+    private UserResponseDTO userResponseDTO1;
+    private UserResponseDTO userResponseDTO2;
 
 
 
@@ -69,8 +69,8 @@ class UserServiceTest {
         user2.setLoans(Set.of(new Loan()));
         user2.setPassword("password456");
 
-        userDTO1 = new UserDTO(1L, "User One", "Surname One", "emailOne@test.com", true);
-        userDTO2 = new UserDTO(2L, "User Two", "Surname Two", "emailTwo@test.com", false);
+        userResponseDTO1 = new UserResponseDTO(1L, "User One", "Surname One", "emailOne@test.com", true);
+        userResponseDTO2 = new UserResponseDTO(2L, "User Two", "Surname Two", "emailTwo@test.com", false);
 
     }
     @Test
@@ -102,17 +102,17 @@ class UserServiceTest {
         try (MockedStatic<UserMapper> mockedMapper = Mockito.mockStatic(UserMapper.class)) {
             // given
             List<User> users = List.of(user1, user2);
-            List<UserDTO> userDTOList = List.of(userDTO1, userDTO2);
+            List<UserResponseDTO> userResponseDTOList = List.of(userResponseDTO1, userResponseDTO2);
             given(userRepository.findAll()).willReturn(users);
-            mockedMapper.when(() -> UserMapper.toDTOList(users)).thenReturn(userDTOList);
+            mockedMapper.when(() -> UserMapper.toDTOList(users)).thenReturn(userResponseDTOList);
 
             // when
-            List<UserDTO> foundUsers = userService.findAll();
+            List<UserResponseDTO> foundUsers = userService.findAll();
 
             // then
             assertNotNull(foundUsers);
             assertEquals(2, foundUsers.size());
-            assertEquals(userDTOList, foundUsers);
+            assertEquals(userResponseDTOList, foundUsers);
             verify(userRepository).findAll();
         }
     }
@@ -122,14 +122,14 @@ class UserServiceTest {
         try (MockedStatic<UserMapper> mockedMapper = Mockito.mockStatic(UserMapper.class)) {
             // given
             given(userRepository.findByEmail(user1.getEmail())).willReturn(user1);
-            mockedMapper.when(() -> UserMapper.toDTO(user1)).thenReturn(userDTO1);
+            mockedMapper.when(() -> UserMapper.toDTO(user1)).thenReturn(userResponseDTO1);
 
             // when
-            UserDTO foundUser = userService.findByEmail(userDTO1.email());
+            UserResponseDTO foundUser = userService.findByEmail(userResponseDTO1.email());
 
             // then
             assertNotNull(foundUser);
-            assertEquals(userDTO1.email(), foundUser.email());
+            assertEquals(userResponseDTO1.email(), foundUser.email());
             verify(userRepository).findByEmail(user1.getEmail());
         }
     }
@@ -140,7 +140,7 @@ class UserServiceTest {
         given(userRepository.findByEmail(email)).willReturn(null);
 
         // when
-        UserDTO foundUser = userService.findByEmail(email);
+        UserResponseDTO foundUser = userService.findByEmail(email);
 
         // then
         assertNull(foundUser);
@@ -154,7 +154,7 @@ class UserServiceTest {
         given(userRepository.findById(user1.getId())).willReturn(Optional.of(user1));
 
         // when
-        UserDTO foundUser = userService.findById(user1.getId());
+        UserResponseDTO foundUser = userService.findById(user1.getId());
 
         // then
         assertNotNull(foundUser);

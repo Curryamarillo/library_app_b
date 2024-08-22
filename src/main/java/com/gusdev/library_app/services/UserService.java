@@ -1,6 +1,6 @@
 package com.gusdev.library_app.services;
 
-import com.gusdev.library_app.dtoResponse.UserDTO;
+import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.User;
 import com.gusdev.library_app.exceptions.UserAlreadyExistsException;
 import com.gusdev.library_app.exceptions.UserCantBeDeletedHasLoanException;
@@ -35,17 +35,17 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public List<UserDTO> findAll() {
+    public List<UserResponseDTO> findAll() {
         List<User> users = userRepository.findAll();
         return UserMapper.toDTOList(users);
     }
 
-    public UserDTO findById(Long id) {
+    public UserResponseDTO findById(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
         return UserMapper.toDTO(user);
     }
 
-    public UserDTO findByEmail(String email) {
+    public UserResponseDTO findByEmail(String email) {
         User user = userRepository.findByEmail(email);
         if (user == null) {
             return null;
