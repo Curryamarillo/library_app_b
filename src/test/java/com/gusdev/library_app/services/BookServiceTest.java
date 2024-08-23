@@ -1,6 +1,7 @@
 package com.gusdev.library_app.services;
 
 import com.gusdev.library_app.dtoRequest.BookRequestDTO;
+import com.gusdev.library_app.dtoResponse.BookResponseDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.exceptions.BookAlreadyExistsException;
@@ -23,9 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-
 @ExtendWith(MockitoExtension.class)
 class BookServiceTest {
+
     @Mock
     private BookRepository bookRepository;
 
@@ -34,10 +35,12 @@ class BookServiceTest {
 
     private Book book1;
     private Book book2;
-    private BookRequestDTO bookRequestDTO1;
-    private BookRequestDTO bookRequestDTO2;
+    private BookResponseDTO bookResponseDTO1;
+    private BookResponseDTO bookResponseDTO2;
+
     @BeforeEach
     void setUp() {
+        // Inicialización de objetos Book
         book1 = new Book();
         book1.setId(1L);
         book1.setTitle("Book One");
@@ -54,9 +57,11 @@ class BookServiceTest {
         book2.setIsbn("67890");
         book2.setLoans(Set.of(new Loan()));
 
-        bookRequestDTO1 = new BookRequestDTO(1L, "Book One", "Author One", "12345", true);
-        bookRequestDTO2 = new BookRequestDTO(2L, "Book Two", "Author Two", "67890", false);
+        // Inicialización de DTOs de respuesta
+        bookResponseDTO1 = new BookResponseDTO(1L, "Book One", "Author One", "12345", true);
+        bookResponseDTO2 = new BookResponseDTO(2L, "Book Two", "Author Two", "67890", false);
     }
+
     @Test
     void createBookTest() {
         // given
@@ -115,11 +120,13 @@ class BookServiceTest {
         assertEquals(book1.getTitle(), foundBooks.get(0).getTitle());
         verify(bookRepository).findByTitleIgnoreCase(title);
     }
+
     @Test
     void findByTitleContainingIgnoreCase() {
         // given
         String title = "book one";
         given(bookRepository.findByTitleContainingIgnoreCase(title)).willReturn(Collections.singletonList(book1));
+
         // when
         List<Book> foundBooks = bookService.findByTitleContainingIgnoreCase(title);
 
@@ -132,12 +139,12 @@ class BookServiceTest {
 
     @Test
     void notFindByTitleContainingIgnoreCase() {
-       when(bookRepository.findByTitleContainingIgnoreCase("NoBook"))
-               .thenReturn(Collections.emptyList());
+        when(bookRepository.findByTitleContainingIgnoreCase("NoBook"))
+                .thenReturn(Collections.emptyList());
 
-       assertThrows(BookNotFoundException.class, () -> {
-           bookService.findByTitleContainingIgnoreCase("NoBook");
-       });
+        assertThrows(BookNotFoundException.class, () -> {
+            bookService.findByTitleContainingIgnoreCase("NoBook");
+        });
         verify(bookRepository).findByTitleContainingIgnoreCase("NoBook");
     }
 
@@ -185,11 +192,11 @@ class BookServiceTest {
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
         // when
-        Optional<BookRequestDTO> foundBook = bookService.findById(book1.getId());
+        Optional<BookResponseDTO> foundBook = bookService.findById(book1.getId());
 
         // then
         assertTrue(foundBook.isPresent());
-        assertEquals(bookRequestDTO1.title(), foundBook.get().title());
+        assertEquals(bookResponseDTO1.title(), foundBook.get().title());
         verify(bookRepository).findById(book1.getId());
     }
 
@@ -200,7 +207,7 @@ class BookServiceTest {
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
 
         // when
-        Optional<BookRequestDTO> foundBook = bookService.findById(nonExistingId);
+        Optional<BookResponseDTO> foundBook = bookService.findById(nonExistingId);
 
         // then
         assertFalse(foundBook.isPresent());
@@ -212,8 +219,8 @@ class BookServiceTest {
         // given
         given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
 
-
         // when
+        BookRequestDTO bookRequestDTO1 = new BookRequestDTO(bookResponseDTO1.id(), bookResponseDTO1.title(), bookResponseDTO1.author(), bookResponseDTO1.isbn(), bookResponseDTO1.isAvailable());
         bookService.update(book1.getId(), bookRequestDTO1);
 
         // then
@@ -226,6 +233,8 @@ class BookServiceTest {
         // given
         Long nonExistingId = 999L;
         given(bookRepository.findById(nonExistingId)).willReturn(Optional.empty());
+        BookRequestDTO bookRequestDTO1 = new BookRequestDTO(bookResponseDTO1.id(), bookResponseDTO1.title(), bookResponseDTO1.author(), bookResponseDTO1.isbn(), bookResponseDTO1.isAvailable());
+
 
         // when & then
         assertThrows(BookNotFoundException.class, () -> bookService.update(nonExistingId, bookRequestDTO1));

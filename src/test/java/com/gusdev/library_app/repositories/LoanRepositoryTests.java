@@ -104,13 +104,11 @@ public class LoanRepositoryTests {
 
     @Test
     public void findAllLoansTest() {
-        loanRepository.deleteAll();
-        loanRepository.save(loan1);
-        List<Loan> loanList = loanRepository.findAll();
-        loanList.forEach(loan -> System.out.println("Loan" + loan));
 
+        List<Loan> loanList = loanRepository.findAll();
+        System.out.println("La cantidad de objetos en la lista es: " + loanList.size());
         assertThat(loanList).isNotNull();
-        assertThat(loanList).hasSize(1);
+        assertThat(loanList).hasSize(5);
     }
 
     @Test

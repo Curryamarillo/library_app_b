@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,6 +57,8 @@ class LoanControllerTests {
     private JwtUtils jwtUtils;
 
     private Loan loan1;
+    private User user1;
+    private Book book1;
     private LoanResponseDTO loanResponseDTO1;
     private LoanResponseDTO loanResponseDTO2;
     private final LocalDateTime loanDate = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
@@ -71,6 +74,23 @@ class LoanControllerTests {
         loan1.setLoanDate(loanDate);
         loan1.setReturnDate(returnDate);
 
+        book1 = new Book();
+        book1.setId(1L);
+        book1.setTitle("Book One");
+        book1.setAuthor("Author One");
+        book1.setIsAvailable(true);
+        book1.setIsbn("12345");
+        book1.setLoans(Set.of(new Loan()));
+
+        user1 = new User();
+        user1.setId(1L);
+        user1.setName("User One");
+        user1.setSurname("Surname One");
+        user1.setEmail("emailOne@test.com");
+        user1.setIsAdmin(true);
+        user1.setLoans(Set.of(new Loan()));
+        user1.setPassword("password123");
+
         loanResponseDTO1 = new LoanResponseDTO(1L, 1L, 1L, loanDate, returnDate);
         loanResponseDTO2 = new LoanResponseDTO(2L, 2L, 2L, loanDate, returnDate);
         jwtToken = generateJwtToken();
@@ -79,21 +99,30 @@ class LoanControllerTests {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("emailOne@test.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
         return jwtUtils.createToken(auth);
     }
-    @WithMockUser(roles = "USER_ADMIN") // Simula un usuario autenticado con rol USER_ADMIN
+    @WithMockUser(roles = "USER_ADMIN")
     @Test
     void createLoanTest() throws Exception {
-
+        // Given
+        loan1 = new Loan();
+        loan1.setId(1L);
+        loan1.setUser(user1);
+        loan1.setBook(book1);
+        loan1.setLoanDate(loanDate);
+        loan1.setReturnDate(returnDate);
         given(loanService.create(any(LoanRequestDTO.class))).willReturn(loan1);
 
+        // Crear un LoanRequestDTO para enviar en la petición
+        LoanRequestDTO loanRequestDTO = new LoanRequestDTO(user1.getId(), book1.getId());
 
-        String loanDTOJson = objectMapper.writeValueAsString(loanResponseDTO1);
+        // Convertir LoanRequestDTO a JSON
+        String loanDTOJson = objectMapper.writeValueAsString(loanRequestDTO);
 
-
+        // When
         ResultActions result = mockMvc.perform(post("/loans/create")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(String.valueOf(loanResponseDTO1)));
+                .content(loanDTOJson)); // Usar loanDTOJson aquí
 
-
+        // Then
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.id").value(loanResponseDTO1.id()))
@@ -108,8 +137,9 @@ class LoanControllerTests {
                 .andExpect(jsonPath("$.returnDate[1]").value(1))    // Month
                 .andExpect(jsonPath("$.returnDate[2]").value(1))    // Day
                 .andExpect(jsonPath("$.returnDate[3]").value(12))   // Hour
-                .andExpect(jsonPath("$.returnDate[4]").value(0));   // Minute
+                .andExpect(jsonPath("$.returnDate[4]").value(0));    // Minute
     }
+
 
     @Test
     void findAllLoansTest() throws Exception {

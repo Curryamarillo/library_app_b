@@ -1,6 +1,7 @@
 package com.gusdev.library_app.controller;
 
 import com.gusdev.library_app.dtoRequest.BookRequestDTO;
+import com.gusdev.library_app.dtoResponse.BookResponseDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.services.BookService;
@@ -32,12 +33,12 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookRequestDTO>> findAll() {
+    public ResponseEntity<List<BookResponseDTO>> findAll() {
         List<Book> bookList = bookService.findAll();
-        List<BookRequestDTO> bookRequestDTOList = bookList.stream()
+        List<BookResponseDTO> bookResponseDTOList = bookList.stream()
                 .map(BookMapper::toDto)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(bookRequestDTOList);
+        return ResponseEntity.ok(bookResponseDTOList);
     }
 
     @GetMapping("/title/{title}")
@@ -46,17 +47,17 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
     @GetMapping("/title/v2/{title}")
-    public ResponseEntity<List<BookRequestDTO>> findByTitleIgnoreCase(@PathVariable String title) {
+    public ResponseEntity<List<BookResponseDTO>> findByTitleIgnoreCase(@PathVariable String title) {
         List<Book> books = bookService.findByTitleContainingIgnoreCase(title);
-        List<BookRequestDTO> bookRequestDTOList = books.stream()
+        List<BookResponseDTO> bookResponseDTOList = books.stream()
                 .map(BookMapper::toDto)
                 .toList();
-        return ResponseEntity.ok(bookRequestDTOList);
+        return ResponseEntity.ok(bookResponseDTOList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookRequestDTO> findById(@PathVariable Long id) {
-        BookRequestDTO bookRequestDTO = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
+    public ResponseEntity<BookResponseDTO> findById(@PathVariable Long id) {
+        BookResponseDTO bookRequestDTO = bookService.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
         return ResponseEntity.ok(bookRequestDTO);
     }
 

@@ -1,8 +1,10 @@
 package com.gusdev.library_app.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gusdev.library_app.config.security.JwtUtils;
 import com.gusdev.library_app.dtoRequest.BookRequestDTO;
+import com.gusdev.library_app.dtoResponse.BookResponseDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.services.BookService;
@@ -27,6 +29,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.doThrow;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -47,11 +50,14 @@ public class BookControllerTests {
     private JwtUtils jwtUtils;
 
     private List<Book> bookList;
-    private List<BookRequestDTO> bookRequestDTOList;
+    private List<BookResponseDTO> bookResponseDTOList;
     private Book book1;
+    private Book book2;
+    private Book book3;
+    private BookResponseDTO bookResponseDTO1;
+    private BookResponseDTO bookResponseDTO2;
+    private BookResponseDTO bookResponseDTO3;
     private BookRequestDTO bookRequestDTO1;
-    private BookRequestDTO bookRequestDTO2;
-    private BookRequestDTO bookRequestDTO3;
     private String jwtToken;
 
     @BeforeEach
@@ -66,7 +72,7 @@ public class BookControllerTests {
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        Book book2 = Book.builder()
+        book2 = Book.builder()
                 .id(2L)
                 .title("Book Two")
                 .author("Author Two")
@@ -75,7 +81,7 @@ public class BookControllerTests {
                 .createdDate(LocalDateTime.now())
                 .build();
 
-        Book book3 = Book.builder()
+        book3 = Book.builder()
                 .id(3L)
                 .title("Book Three")
                 .author("Author Three")
@@ -90,15 +96,17 @@ public class BookControllerTests {
         bookList.add(book2);
         bookList.add(book3);
 
-        // Instanciar los DTOs correspondientes
-        bookRequestDTO1 = new BookRequestDTO(1L, "Book One", "Author One", "12345", true);
-        bookRequestDTO2 = new BookRequestDTO(2L, "Book Two", "Author Two", "67890", true);
-        bookRequestDTO3 = new BookRequestDTO(3L, "Book Three", "Author Three", "54321", false);
+        // Instanciar los DTOs de respuesta correspondientes
+        bookResponseDTO1 = new BookResponseDTO(1L, "Book One", "Author One", "12345", true);
+        bookResponseDTO2 = new BookResponseDTO(2L, "Book Two", "Author Two", "67890", true);
+        bookResponseDTO3 = new BookResponseDTO(3L, "Book Three", "Author Three", "54321", false);
 
-        bookRequestDTOList = new ArrayList<>();
-        bookRequestDTOList.add(bookRequestDTO1);
-        bookRequestDTOList.add(bookRequestDTO2);
-        bookRequestDTOList.add(bookRequestDTO3);
+        bookRequestDTO1 = new BookRequestDTO(1L, "Book One", "Author One", "12345", true);
+
+        bookResponseDTOList = new ArrayList<>();
+        bookResponseDTOList.add(bookResponseDTO1);
+        bookResponseDTOList.add(bookResponseDTO2);
+        bookResponseDTOList.add(bookResponseDTO3);
 
         // Generar el token JWT
         jwtToken = generateJwtToken();
@@ -120,11 +128,11 @@ public class BookControllerTests {
 
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(bookRequestDTO1.id()))
-                .andExpect(jsonPath("$.title").value(bookRequestDTO1.title()))
-                .andExpect(jsonPath("$.author").value(bookRequestDTO1.author()))
-                .andExpect(jsonPath("$.isbn").value(bookRequestDTO1.isbn()))
-                .andExpect(jsonPath("$.isAvailable").value(bookRequestDTO1.isAvailable()));
+                .andExpect(jsonPath("$.id").value(bookResponseDTO1.id()))
+                .andExpect(jsonPath("$.title").value(bookResponseDTO1.title()))
+                .andExpect(jsonPath("$.author").value(bookResponseDTO1.author()))
+                .andExpect(jsonPath("$.isbn").value(bookResponseDTO1.isbn()))
+                .andExpect(jsonPath("$.isAvailable").value(bookResponseDTO1.isAvailable()));
     }
 
     @Test
@@ -137,37 +145,37 @@ public class BookControllerTests {
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$", hasSize(3)))
-                .andExpect(jsonPath("$[0].id").value(bookRequestDTO1.id()))
-                .andExpect(jsonPath("$[0].title").value(bookRequestDTO1.title()))
-                .andExpect(jsonPath("$[0].author").value(bookRequestDTO1.author()))
-                .andExpect(jsonPath("$[0].isbn").value(bookRequestDTO1.isbn()))
-                .andExpect(jsonPath("$[0].isAvailable").value(bookRequestDTO1.isAvailable()))
-                .andExpect(jsonPath("$[1].id").value(bookRequestDTO2.id()))
-                .andExpect(jsonPath("$[1].title").value(bookRequestDTO2.title()))
-                .andExpect(jsonPath("$[1].author").value(bookRequestDTO2.author()))
-                .andExpect(jsonPath("$[1].isbn").value(bookRequestDTO2.isbn()))
-                .andExpect(jsonPath("$[1].isAvailable").value(bookRequestDTO2.isAvailable()))
-                .andExpect(jsonPath("$[2].id").value(bookRequestDTO3.id()))
-                .andExpect(jsonPath("$[2].title").value(bookRequestDTO3.title()))
-                .andExpect(jsonPath("$[2].author").value(bookRequestDTO3.author()))
-                .andExpect(jsonPath("$[2].isbn").value(bookRequestDTO3.isbn()))
-                .andExpect(jsonPath("$[2].isAvailable").value(bookRequestDTO3.isAvailable()));
+                .andExpect(jsonPath("$[0].id").value(bookResponseDTO1.id()))
+                .andExpect(jsonPath("$[0].title").value(bookResponseDTO1.title()))
+                .andExpect(jsonPath("$[0].author").value(bookResponseDTO1.author()))
+                .andExpect(jsonPath("$[0].isbn").value(bookResponseDTO1.isbn()))
+                .andExpect(jsonPath("$[0].isAvailable").value(bookResponseDTO1.isAvailable()))
+                .andExpect(jsonPath("$[1].id").value(bookResponseDTO2.id()))
+                .andExpect(jsonPath("$[1].title").value(bookResponseDTO2.title()))
+                .andExpect(jsonPath("$[1].author").value(bookResponseDTO2.author()))
+                .andExpect(jsonPath("$[1].isbn").value(bookResponseDTO2.isbn()))
+                .andExpect(jsonPath("$[1].isAvailable").value(bookResponseDTO2.isAvailable()))
+                .andExpect(jsonPath("$[2].id").value(bookResponseDTO3.id()))
+                .andExpect(jsonPath("$[2].title").value(bookResponseDTO3.title()))
+                .andExpect(jsonPath("$[2].author").value(bookResponseDTO3.author()))
+                .andExpect(jsonPath("$[2].isbn").value(bookResponseDTO3.isbn()))
+                .andExpect(jsonPath("$[2].isAvailable").value(bookResponseDTO3.isAvailable()));
     }
 
     @Test
     void findBookById() throws Exception {
-        given(bookService.findById(1L)).willReturn(Optional.of(bookRequestDTO1));
+        given(bookService.findById(1L)).willReturn(Optional.of(bookResponseDTO1));
 
         ResultActions result = mockMvc.perform(get("/books/{id}", 1L)
                 .header("Authorization", "Bearer " + jwtToken)); // Usar el token JWT
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(bookRequestDTO1.id()))
-                .andExpect(jsonPath("$.title").value(bookRequestDTO1.title()))
-                .andExpect(jsonPath("$.author").value(bookRequestDTO1.author()))
-                .andExpect(jsonPath("$.isbn").value(bookRequestDTO1.isbn()))
-                .andExpect(jsonPath("$.isAvailable").value(bookRequestDTO1.isAvailable()));
+                .andExpect(jsonPath("$.id").value(bookResponseDTO1.id()))
+                .andExpect(jsonPath("$.title").value(bookResponseDTO1.title()))
+                .andExpect(jsonPath("$.author").value(bookResponseDTO1.author()))
+                .andExpect(jsonPath("$.isbn").value(bookResponseDTO1.isbn()))
+                .andExpect(jsonPath("$.isAvailable").value(bookResponseDTO1.isAvailable()));
     }
 
     @Test
@@ -181,23 +189,58 @@ public class BookControllerTests {
     }
 
     @Test
-    void findByTitleIgnoreCaseTest() throws Exception {
-        List<Book> filteredList = new ArrayList<>();
-        filteredList.add(book1);
+    void findByAuthorTest() throws Exception {
+        // Configurar los libros que serán retornados por el servicio
+        given(bookService.findByAuthorIgnoreCase(book1.getAuthor())).willReturn(List.of(book1, book2));
 
-        given(bookService.findByTitleIgnoreCase("Book One")).willReturn(filteredList);
+        // Realizar la petición al endpoint
+        ResultActions result = mockMvc.perform(get("/books/author/{author}", book1.getAuthor())
+                .header("Authorization", "Bearer " + jwtToken));
+
+        // Verificar los resultados
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(2))) // Verificar que hay dos libros en la lista
+                .andExpect(jsonPath("$[0].id").value(book1.getId())) // Verificar el primer libro
+                .andExpect(jsonPath("$[0].title").value(book1.getTitle()))
+                .andExpect(jsonPath("$[0].author").value(book1.getAuthor()))
+                .andExpect(jsonPath("$[0].isbn").value(book1.getIsbn()))
+                .andExpect(jsonPath("$[0].isAvailable").value(book1.getIsAvailable()))
+                .andExpect(jsonPath("$[1].id").value(book2.getId())) // Verificar el segundo libro
+                .andExpect(jsonPath("$[1].title").value(book2.getTitle()))
+                .andExpect(jsonPath("$[1].author").value(book2.getAuthor()))
+                .andExpect(jsonPath("$[1].isbn").value(book2.getIsbn()))
+                .andExpect(jsonPath("$[1].isAvailable").value(book2.getIsAvailable()));
+    }
+
+
+
+    @Test
+    void findByTitleIgnoreCaseTest() throws Exception {
+        given(bookService.findByTitleIgnoreCase("Book One")).willReturn(List.of(book1, book2, book3));
 
         ResultActions result = mockMvc.perform(get("/books/title/{title}", "Book One")
                 .header("Authorization", "Bearer " + jwtToken)); // Usar el token JWT
 
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(book1.getId()))
-                .andExpect(jsonPath("$[0].title").value(book1.getTitle()))
-                .andExpect(jsonPath("$[0].author").value(book1.getAuthor()))
-                .andExpect(jsonPath("$[0].isbn").value(book1.getIsbn()))
-                .andExpect(jsonPath("$[0].isAvailable").value(book1.getIsAvailable()));
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id").value(bookResponseDTO1.id()))
+                .andExpect(jsonPath("$[0].title").value(bookResponseDTO1.title()))
+                .andExpect(jsonPath("$[0].author").value(bookResponseDTO1.author()))
+                .andExpect(jsonPath("$[0].isbn").value(bookResponseDTO1.isbn()))
+                .andExpect(jsonPath("$[0].isAvailable").value(bookResponseDTO1.isAvailable()))
+                .andExpect(jsonPath("$[1].id").value(bookResponseDTO2.id()))
+                .andExpect(jsonPath("$[1].title").value(bookResponseDTO2.title()))
+                .andExpect(jsonPath("$[1].author").value(bookResponseDTO2.author()))
+                .andExpect(jsonPath("$[1].isbn").value(bookResponseDTO2.isbn()))
+                .andExpect(jsonPath("$[1].isAvailable").value(bookResponseDTO2.isAvailable()))
+                .andExpect(jsonPath("$[2].id").value(bookResponseDTO3.id()))
+                .andExpect(jsonPath("$[2].title").value(bookResponseDTO3.title()))
+                .andExpect(jsonPath("$[2].author").value(bookResponseDTO3.author()))
+                .andExpect(jsonPath("$[2].isbn").value(bookResponseDTO3.isbn()))
+                .andExpect(jsonPath("$[2].isAvailable").value(bookResponseDTO3.isAvailable()));
+
     }
 
     @Test
@@ -218,5 +261,32 @@ public class BookControllerTests {
                 .header("Authorization", "Bearer " + jwtToken)); // Usar el token JWT
 
         result.andExpect(status().isNotFound());
+    }
+    @Test
+    void UpdateBookTestSuccess() throws Exception {
+    doNothing().when(bookService).update(book2.getId(),bookRequestDTO1);
+
+    mockMvc.perform(put("/books/{id}", book2.getId())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(bookRequestDTO1))
+            .header("Authorization", "Bearer " + jwtToken))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.title").value("Book One"))
+            .andExpect(jsonPath("$.author").value("Author One"))
+            .andExpect(jsonPath("$.isbn").value("12345"))
+            .andExpect(jsonPath("$.isAvailable").value(true));
+    }
+
+    @Test
+    void UpdateBookNotFoundException() throws Exception {
+
+        doThrow(new BookNotFoundException("Book not found")).when(bookService).update(book1.getId(), bookRequestDTO1);
+
+        mockMvc.perform(put("/books/{id}", book1.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(bookRequestDTO1))
+                        .header("Authorization", "Bearer " + jwtToken)) // Usar el token JWT
+                .andExpect(status().isNotFound());
+
     }
 }

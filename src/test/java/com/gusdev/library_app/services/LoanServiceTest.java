@@ -5,15 +5,20 @@ import com.gusdev.library_app.dtoResponse.LoanResponseDTO;
 import com.gusdev.library_app.entities.Book;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
+import com.gusdev.library_app.exceptions.BookNotFoundException;
 import com.gusdev.library_app.exceptions.LoanAlreadyExistsException;
 import com.gusdev.library_app.exceptions.LoanNotFoundException;
+import com.gusdev.library_app.exceptions.UserNotFoundException;
+import com.gusdev.library_app.repositories.BookRepository;
 import com.gusdev.library_app.repositories.LoanRepository;
+import com.gusdev.library_app.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -32,6 +37,12 @@ class LoanServiceTest {
 
     @Mock
     private LoanRepository loanRepository;
+
+    @Mock
+    private BookRepository bookRepository;
+
+    @Mock
+    UserRepository userRepository;
 
     @InjectMocks
     private LoanService loanService;
@@ -124,7 +135,8 @@ class LoanServiceTest {
     @Test
     void createLoan_Successful() {
         // Given
-        loan1.getBook().setIsAvailable(true);
+        given(userRepository.findById(user1.getId())).willReturn(Optional.of(user1));
+        given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
         given(loanRepository.save(any(Loan.class))).willReturn(loan1);
 
         // When
@@ -133,18 +145,38 @@ class LoanServiceTest {
         // Then
         assertNotNull(createdLoan);
         assertEquals(loan1.getId(), createdLoan.getId());
+        assertEquals(book1.getId(), createdLoan.getBook().getId());
+        assertEquals(user1.getId(), createdLoan.getUser().getId());
         assertFalse(loan1.getBook().getIsAvailable(), "Book should not be available after loan creation");
+
     }
 
     @Test
-    void createLoan_FailureLoanAlreadyExists() {
+    void createLoan_BookNotFound() {
+        given(bookRepository.findById(book1.getId())).willReturn(Optional.empty());
+
+        assertThrows(BookNotFoundException.class, () -> loanService.create(loanRequestDTO1));
+    }
+
+    @Test
+    void createLoan_UserNotFound() {
         // Given
-        loan1.getBook().setIsAvailable(false);
+        given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
+        given(userRepository.findById(user1.getId())).willReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(UserNotFoundException.class, () -> loanService.create(loanRequestDTO1));
+    }
+    @Test
+    void createLoan_BookNotAvailable() {
+        // Given
+        book1.setIsAvailable(false);
+        given(bookRepository.findById(book1.getId())).willReturn(Optional.of(book1));
+        given(userRepository.findById(user1.getId())).willReturn(Optional.of(user1));
 
         // When & Then
         assertThrows(LoanAlreadyExistsException.class, () -> loanService.create(loanRequestDTO1));
     }
-
     @Test
     void findAllLoans() {
         // Given
