@@ -214,12 +214,39 @@ public class BookControllerTests {
     }
 
 
-
     @Test
-    void findByTitleIgnoreCaseTest() throws Exception {
-        given(bookService.findByTitleIgnoreCase("Book One")).willReturn(List.of(book1, book2, book3));
+    void findByTitleTest() throws Exception {
+        given(bookService.findByTitleIgnoreCase("book")).willReturn(List.of(book1, book2, book3));
 
-        ResultActions result = mockMvc.perform(get("/books/title/{title}", "Book One")
+        ResultActions result = mockMvc.perform(get("/books/title/{title}", "book")
+                .header("Authorization", "Bearer " + jwtToken)); // Usar el token JWT
+
+        result.andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$", hasSize(3)))
+                .andExpect(jsonPath("$[0].id").value(bookResponseDTO1.id()))
+                .andExpect(jsonPath("$[0].title").value(bookResponseDTO1.title()))
+                .andExpect(jsonPath("$[0].author").value(bookResponseDTO1.author()))
+                .andExpect(jsonPath("$[0].isbn").value(bookResponseDTO1.isbn()))
+                .andExpect(jsonPath("$[0].isAvailable").value(bookResponseDTO1.isAvailable()))
+                .andExpect(jsonPath("$[1].id").value(bookResponseDTO2.id()))
+                .andExpect(jsonPath("$[1].title").value(bookResponseDTO2.title()))
+                .andExpect(jsonPath("$[1].author").value(bookResponseDTO2.author()))
+                .andExpect(jsonPath("$[1].isbn").value(bookResponseDTO2.isbn()))
+                .andExpect(jsonPath("$[1].isAvailable").value(bookResponseDTO2.isAvailable()))
+                .andExpect(jsonPath("$[2].id").value(bookResponseDTO3.id()))
+                .andExpect(jsonPath("$[2].title").value(bookResponseDTO3.title()))
+                .andExpect(jsonPath("$[2].author").value(bookResponseDTO3.author()))
+                .andExpect(jsonPath("$[2].isbn").value(bookResponseDTO3.isbn()))
+                .andExpect(jsonPath("$[2].isAvailable").value(bookResponseDTO3.isAvailable()));
+
+    }
+    @Test
+    void findByTitleContainingIgnoreCaseTest() throws Exception {
+
+        given(bookService.findByTitleContainingIgnoreCase("book")).willReturn(List.of(book1, book2, book3));
+
+        ResultActions result = mockMvc.perform(get("/books/title/v2/{title}", "book")
                 .header("Authorization", "Bearer " + jwtToken)); // Usar el token JWT
 
         result.andExpect(status().isOk())
