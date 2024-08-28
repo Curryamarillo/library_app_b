@@ -58,6 +58,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
         if(userSaved.getIsAdmin()) {
+
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));

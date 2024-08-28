@@ -47,6 +47,13 @@ public class LoanController {
         return new ResponseEntity<>(createdLoanResponseDTO, HttpStatus.CREATED);
     }
 
+    @PostMapping("/return")
+    public ResponseEntity<LoanResponseDTO> returnLoan(@RequestBody LoanRequestDTO loanRequestDTO) {
+        LoanResponseDTO returnLoan = loanService.returnLoan(loanRequestDTO);
+        System.out.println(returnLoan);
+        return new ResponseEntity<>(returnLoan, HttpStatus.OK);
+    }
+
 
 
     @GetMapping("/{id}")
@@ -58,6 +65,17 @@ public class LoanController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<LoanResponseDTO>> findByUserId(@PathVariable Long id) {
+        try {
+            List<LoanResponseDTO> loanResponseDTOList = loanService.findByUserID(id);
+            return ResponseEntity.ok(loanResponseDTOList);
+        } catch (LoanNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         loanService.deleteById(id);

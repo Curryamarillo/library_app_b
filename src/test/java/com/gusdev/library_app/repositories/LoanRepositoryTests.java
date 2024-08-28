@@ -108,7 +108,7 @@ public class LoanRepositoryTests {
         List<Loan> loanList = loanRepository.findAll();
         System.out.println("La cantidad de objetos en la lista es: " + loanList.size());
         assertThat(loanList).isNotNull();
-        assertThat(loanList).hasSize(5);
+        assertThat(loanList).hasSize(6);
     }
 
     @Test
@@ -120,6 +120,15 @@ public class LoanRepositoryTests {
         assertThat(foundLoan).isPresent();
         assertThat(foundLoan.get().getId()).isEqualTo(loan1.getId());
     }
+
+    @Test
+    public  void findByUserIdTest() {
+        List<Loan> loanList = loanRepository.findByUserId(loan1.getUser().getId());
+
+        assertThat(loanList).isNotNull();
+        assertThat(loanList).hasSize(1);
+    }
+
 
     @Test
     public void updateLoanTest() {

@@ -1,7 +1,7 @@
 INSERT INTO books (title, author, isbn, is_available, created_date)
 VALUES ('The Great Gatsby', 'F. Scott Fitzgerald', '978-3-16-148410-0', false, CURRENT_TIMESTAMP),
 ('To Kill a Mockingbird', 'Harper Lee', '978-3-16-148411-0', false, CURRENT_TIMESTAMP),
-('1984', 'George Orwell', '978-3-16-148412-0', true, CURRENT_TIMESTAMP),
+('1984', 'George Orwell', '978-3-16-148412-0', false, CURRENT_TIMESTAMP),
 ('The Catcher in the Rye', 'J.D. Salinger', '978-0-316-76948-0', true, CURRENT_TIMESTAMP),
 ('Brave New World', 'Aldous Huxley', '978-0-06-085052-4', true, CURRENT_TIMESTAMP),
 ('The Lord of the Rings', 'J.R.R. Tolkien', '978-0-618-64015-7', true, CURRENT_TIMESTAMP),
@@ -25,6 +25,11 @@ INSERT INTO loans (user_id, book_id, loan_date)
 VALUES (
   (SELECT id FROM users WHERE email = 'john.doe@example.com'),
   (SELECT id FROM books WHERE title = 'The Great Gatsby'),
+  CURRENT_TIMESTAMP
+),
+(
+  (SELECT id FROM users WHERE email = 'john.doe@example.com'),
+  (SELECT id FROM books WHERE title = '1984'),
   CURRENT_TIMESTAMP
 ),
 (

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @RestController
 @RequestMapping("/books")
 public class BookController {
@@ -67,7 +66,7 @@ public class BookController {
         return ResponseEntity.ok(books);
     }
 
-    @CrossOrigin
+
     @PutMapping("/{id}")
     public ResponseEntity<BookRequestDTO> updateBook(@PathVariable Long id, @RequestBody BookRequestDTO bookRequestDTO) {
         try {
@@ -77,7 +76,7 @@ public class BookController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
-    @CrossOrigin
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
         bookService.deleteBook(id);

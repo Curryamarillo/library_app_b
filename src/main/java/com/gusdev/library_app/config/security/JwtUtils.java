@@ -21,7 +21,7 @@ public class JwtUtils {
     @Value("$security.jwt.key.private")
     private String privateKey;
 
-    @Value("${security.jwt.key.private}")
+    @Value("${security.jwt.user.generator}")
     private String userGenerator;
 
     public String createToken(Authentication authentication) {
@@ -52,7 +52,7 @@ public class JwtUtils {
             throw  new JWTVerificationException("Token Invalid, not authorized");
         }
     }
-    public String extractUsername(DecodedJWT decodedJWT) {return decodedJWT.getSubject().toString();}
+    public String extractUsername(DecodedJWT decodedJWT) {return decodedJWT.getSubject();}
 
     public Claim getSpecicficClaim(DecodedJWT decodedJWT, String claimName) {return  decodedJWT.getClaim(claimName);}
 }

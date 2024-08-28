@@ -20,7 +20,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.BadCredentialsException;
 
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class LoanServiceTest {
@@ -132,6 +133,7 @@ class LoanServiceTest {
 
     }
 
+
     @Test
     void createLoan_Successful() {
         // Given
@@ -220,6 +222,33 @@ class LoanServiceTest {
         assertEquals(loanResponseDTO1.bookId(), foundLoanResponseDTO.bookId());
         assertEquals(loanResponseDTO1.loanDate(), foundLoanResponseDTO.loanDate());
         assertEquals(loanResponseDTO1.returnDate(), foundLoanResponseDTO.returnDate());
+    }
+
+    @Test
+    void findLoanListByUserId() {
+        // Given
+        when(loanRepository.findByUserId(user1.getId())).thenReturn(Arrays.asList(loan1, loan2));
+
+        // When
+        List<LoanResponseDTO> loanResponseDTOList = loanService.findByUserID(user1.getId());
+
+        // Then
+        assertNotNull(loanResponseDTOList);
+        assertEquals(2, loanResponseDTOList.size());
+
+        LoanResponseDTO firstLoanResponseDTO = loanResponseDTOList.get(0);
+        assertEquals(loan1.getId(), firstLoanResponseDTO.id());
+        assertEquals(loan1.getUser().getId(), firstLoanResponseDTO.userId());
+        assertEquals(loan1.getBook().getId(), firstLoanResponseDTO.bookId());
+        assertEquals(loan1.getLoanDate(), firstLoanResponseDTO.loanDate());
+        assertEquals(loan1.getReturnDate(), firstLoanResponseDTO.returnDate());
+
+        LoanResponseDTO secondLoanResponseDTO = loanResponseDTOList.get(1);
+        assertEquals(loan2.getId(), secondLoanResponseDTO.id());
+        assertEquals(loan2.getUser().getId(), secondLoanResponseDTO.userId());
+        assertEquals(loan2.getBook().getId(), secondLoanResponseDTO.bookId());
+        assertEquals(loan2.getLoanDate(), secondLoanResponseDTO.loanDate());
+        assertEquals(loan2.getReturnDate(), secondLoanResponseDTO.returnDate());
     }
 
     @Test

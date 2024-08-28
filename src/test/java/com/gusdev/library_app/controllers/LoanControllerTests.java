@@ -61,8 +61,8 @@ class LoanControllerTests {
     private Book book1;
     private LoanResponseDTO loanResponseDTO1;
     private LoanResponseDTO loanResponseDTO2;
-    private final LocalDateTime loanDate = LocalDateTime.of(2023, 1, 1, 0, 0, 0);
-    private final LocalDateTime returnDate = (LocalDateTime.of(2024, 01, 01, 12, 00));
+    private final LocalDateTime loanDate = LocalDateTime.of(2023, 1, 1, 0, 0, 0, 0);
+    private final LocalDateTime returnDate = (LocalDateTime.of(2024, 01, 01, 12, 0, 0, 0));
     private String jwtToken;
 
     @BeforeEach
@@ -170,6 +170,63 @@ class LoanControllerTests {
                 .andExpect(jsonPath("$.id").value(loanResponseDTO1.id()))
                 .andExpect(jsonPath("$.userId").value(loanResponseDTO1.userId()))
                 .andExpect(jsonPath("$.bookId").value(loanResponseDTO1.bookId()));
+    }
+    @WithMockUser(roles = "USER_ADMIN")
+    @Test
+    void findByUserId_Successful() throws Exception {
+
+        List<LoanResponseDTO> loanResponseDTOList = Arrays.asList(loanResponseDTO1, loanResponseDTO2);
+        given(loanService.findByUserID(1L)).willReturn(loanResponseDTOList);
+
+
+        mockMvc.perform(get("/loans/user/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.length()").value(2))
+
+
+                .andExpect(jsonPath("$[0].id").value(loanResponseDTO1.id()))
+                .andExpect(jsonPath("$[0].userId").value(loanResponseDTO1.userId()))
+                .andExpect(jsonPath("$[0].bookId").value(loanResponseDTO1.bookId()))
+                .andExpect(jsonPath("$[0].loanDate[0]").value(2023)) // Año
+                .andExpect(jsonPath("$[0].loanDate[1]").value(1))    // Mes
+                .andExpect(jsonPath("$[0].loanDate[2]").value(1))    // Día
+                .andExpect(jsonPath("$[0].loanDate[3]").value(0))    // Hora
+                .andExpect(jsonPath("$[0].loanDate[4]").value(0))    // Minuto
+                .andExpect(jsonPath("$[0].returnDate[0]").value(2024)) // Año
+                .andExpect(jsonPath("$[0].returnDate[1]").value(1))    // Mes
+                .andExpect(jsonPath("$[0].returnDate[2]").value(1))    // Día
+                .andExpect(jsonPath("$[0].returnDate[3]").value(12))   // Hora
+                .andExpect(jsonPath("$[0].returnDate[4]").value(0))    // Minuto
+
+
+            .andExpect(jsonPath("$[1].id").value(loanResponseDTO2.id()))
+                .andExpect(jsonPath("$[1].userId").value(loanResponseDTO2.userId()))
+                .andExpect(jsonPath("$[1].bookId").value(loanResponseDTO2.bookId()))
+                .andExpect(jsonPath("$[1].loanDate[0]").value(2023)) // Año
+                .andExpect(jsonPath("$[1].loanDate[1]").value(1))    // Mes
+                .andExpect(jsonPath("$[1].loanDate[2]").value(1))    // Día
+                .andExpect(jsonPath("$[1].loanDate[3]").value(0))    // Hora
+                .andExpect(jsonPath("$[1].loanDate[4]").value(0))    // Minuto
+                .andExpect(jsonPath("$[1].returnDate[0]").value(2024)) // Año
+                .andExpect(jsonPath("$[1].returnDate[1]").value(1))    // Mes
+                .andExpect(jsonPath("$[1].returnDate[2]").value(1))    // Día
+                .andExpect(jsonPath("$[1].returnDate[3]").value(12))   // Hora
+                .andExpect(jsonPath("$[1].returnDate[4]").value(0));    // Minuto
+    }
+
+
+    @WithMockUser(roles = "USER_ADMIN")
+    @Test
+    void findByUserId_NotFound() throws Exception {
+        // Given
+        given(loanService.findByUserID(1L)).willThrow(new LoanNotFoundException("Loans not found"));
+
+        // When & Then
+        mockMvc.perform(get("/user/{id}", 1L)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
     @Test
     void findLoanByIdNotFoundTest() throws Exception {

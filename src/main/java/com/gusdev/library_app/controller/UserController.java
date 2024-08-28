@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -64,7 +63,7 @@ public class UserController {
         }
     }
 
-    @CrossOrigin
+
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> updateUser(@PathVariable Long id, @RequestBody User user) {
         try {
@@ -76,7 +75,7 @@ public class UserController {
         }
     }
 
-    @CrossOrigin
+
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteById(@PathVariable Long id) {
         try {
