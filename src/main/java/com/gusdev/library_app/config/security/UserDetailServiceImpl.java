@@ -38,8 +38,9 @@ public class UserDetailServiceImpl implements UserDetailsService {
         return userRepository.findByEmail(username);
 
 
-        }
-        public AuthResponseDTO createUser(@NotNull UserCreateRequestDTO createUserRequest) {
+    }
+
+    public AuthResponseDTO createUser(@NotNull UserCreateRequestDTO createUserRequest) {
         String email = createUserRequest.email();
         String name = createUserRequest.name();
         String surname = createUserRequest.surname();
@@ -47,26 +48,27 @@ public class UserDetailServiceImpl implements UserDetailsService {
         Boolean isAdmin = createUserRequest.isAdmin();
 
         System.out.println(email);
-            System.out.println(name);
-            System.out.println(surname);
-            System.out.println(password);
-            System.out.println(isAdmin);
+        System.out.println(name);
+        System.out.println(surname);
+        System.out.println(password);
+        System.out.println(isAdmin);
 
 
         User userEntity = User.builder().email(email).name(name).surname(surname).password(passwordEncoder.encode(password)).isAdmin(isAdmin).build();
         User userSaved = userRepository.save(userEntity);
 
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if(userSaved.getIsAdmin()) {
+        if (userSaved.getIsAdmin()) {
 
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
             authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
         }
-            SecurityContext securityContextHolder = SecurityContextHolder.getContext();
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userSaved, null, authorities);
-            String accessToken = jwtUtils.createToken(authentication);
-        return new AuthResponseDTO(email, "User created Succesfully", isAdmin, isAdmin, accessToken, true);
+        SecurityContext securityContextHolder = SecurityContextHolder.getContext();
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userSaved, null, authorities);
+        String accessToken = jwtUtils.createAuthToken(authentication);
+            String refreshToken = jwtUtils.createRefreshToken(authentication);
+        return new AuthResponseDTO(email, "User created Succesfully", isAdmin, isAdmin, accessToken, refreshToken,  true);
         }
 
         public AuthResponseDTO loginUser(LoginRequestDTO authLogin) {
@@ -76,9 +78,10 @@ public class UserDetailServiceImpl implements UserDetailsService {
         Authentication authentication = this.authenticate(username, password);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String accessToken = jwtUtils.createToken(authentication);
+        String accessToken = jwtUtils.createAuthToken(authentication);
+        String refreshToken = jwtUtils.createRefreshToken(authentication);
         Boolean isAdmin = userRepository.findByEmail(username).getIsAdmin();
-            return new AuthResponseDTO(username, "User logged succesfully", true, isAdmin,  accessToken, true);
+            return new AuthResponseDTO(username, "User logged succesfully", true, isAdmin,  accessToken, refreshToken, true);
         }
 
     public Authentication authenticate(String email, String password) {
@@ -92,4 +95,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         }
         return  new UsernamePasswordAuthenticationToken(email, password, userDetails.getAuthorities());
     }
+
+
 }

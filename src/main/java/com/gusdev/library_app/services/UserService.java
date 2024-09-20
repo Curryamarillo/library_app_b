@@ -9,7 +9,9 @@ import com.gusdev.library_app.repositories.LoanRepository;
 import com.gusdev.library_app.repositories.UserRepository;
 import com.gusdev.library_app.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,10 +23,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final LoanRepository loanRepository;
 
+
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    public UserService(UserRepository userRepository, LoanRepository loanRepository) {
+    public UserService(UserRepository userRepository, LoanRepository loanRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.loanRepository = loanRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User create(User user) {
@@ -32,8 +38,13 @@ public class UserService {
         if (existUser) {
             throw new UserAlreadyExistsException("User already exists.");
         }
-        return userRepository.save(user);
+        userRepository.save(user);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
+        userRepository.save(user);
+        return user;
     }
+
 
     public List<UserResponseDTO> findAll() {
         List<User> users = userRepository.findAll();
@@ -69,10 +80,12 @@ public class UserService {
         }
     }
 
+    @Transactional
     public void deleteUser(Long id) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        boolean userHasLoans = loanRepository.existsByUserId(id);
-        if(userHasLoans) {
+        boolean userHasActiveLoans = loanRepository.existsByUserIdAndReturnDateIsNull(id);
+        loanRepository.deleteByUserId(id);
+        if(userHasActiveLoans) {
             throw new UserCantBeDeletedHasLoanException("User cannot be deleted because they have active loans.");
         }
         userRepository.delete(user);

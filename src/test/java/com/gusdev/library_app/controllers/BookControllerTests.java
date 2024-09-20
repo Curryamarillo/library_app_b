@@ -114,7 +114,7 @@ public class BookControllerTests {
 
     private String generateJwtToken() {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("emailOne@test.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        return jwtUtils.createToken(auth); // Generar el token sin el prefijo "Bearer"
+        return jwtUtils.createAuthToken(auth); // Generar el token sin el prefijo "Bearer"
     }
 
     @Test

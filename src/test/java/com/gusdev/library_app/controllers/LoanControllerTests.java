@@ -97,7 +97,7 @@ class LoanControllerTests {
     }
     private String generateJwtToken() {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("emailOne@test.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        return jwtUtils.createToken(auth);
+        return jwtUtils.createAuthToken(auth);
     }
     @WithMockUser(roles = "USER_ADMIN")
     @Test

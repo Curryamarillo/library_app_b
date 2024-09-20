@@ -28,7 +28,9 @@ public class JwtValidator extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    @NotNull HttpServletResponse response,
+                                    @NotNull FilterChain filterChain) throws ServletException, IOException {
 
         String jwtToken = request.getHeader(HttpHeaders.AUTHORIZATION);
 
@@ -40,12 +42,18 @@ public class JwtValidator extends OncePerRequestFilter {
 
                 String username = jwtUtils.extractUsername(decodedJWT);
                 String stringAuthorities = jwtUtils.getSpecicficClaim(decodedJWT, "authorities").asString();
+               boolean isRefreshToken = jwtUtils.isRefreshToken(jwtToken);
+                if (isRefreshToken) {
+                    String newAccessToken = jwtUtils.createAuthToken(new UsernamePasswordAuthenticationToken(username, null, AuthorityUtils.commaSeparatedStringToAuthorityList(stringAuthorities)));
+                    response.setHeader(HttpHeaders.AUTHORIZATION, "Bearer " + newAccessToken);
+                } else {
+                    Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(stringAuthorities);
 
-                Collection<? extends GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(stringAuthorities);
+                    Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                Authentication authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authorities);
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } catch (JWTVerificationException e) {
+                }
+                 } catch (JWTVerificationException e) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }

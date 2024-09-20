@@ -83,7 +83,7 @@ public class UserControllerTests {
 
     private String generateJwtToken() {
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken("emailOne@test.com", null, List.of(new SimpleGrantedAuthority("ROLE_ADMIN")));
-        return "Bearer " + jwtUtils.createToken(auth);
+        return "Bearer " + jwtUtils.createAuthToken(auth);
     }
 
     @Test

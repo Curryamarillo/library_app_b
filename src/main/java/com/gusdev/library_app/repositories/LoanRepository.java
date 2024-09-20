@@ -5,6 +5,7 @@ import jdk.dynalink.linker.LinkerServices;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +18,9 @@ public interface LoanRepository extends JpaRepository<Loan, Long> {
     Loan findByBookId(Long bookId);
 
     boolean existsByUserId(Long id);
+
+    boolean existsByUserIdAndReturnDateIsNull(Long userId);
+
+    void deleteByUserId(Long id);
+
 }

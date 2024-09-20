@@ -77,7 +77,7 @@ public class UserDetailServiceImplTests {
         // given
         UserCreateRequestDTO userCreateRequestDTO = new UserCreateRequestDTO("Doe", "John", email, false, password);
         given(userRepository.save(any(User.class))).willReturn(user);
-        given(jwtUtils.createToken(any(Authentication.class))).willReturn("dummyToken");
+        given(jwtUtils.createAuthToken(any(Authentication.class))).willReturn("dummyToken");
 
         // when
         AuthResponseDTO responseDTO = userDetailService.createUser(userCreateRequestDTO);
@@ -96,7 +96,7 @@ public class UserDetailServiceImplTests {
         LoginRequestDTO loginRequestDTO = new LoginRequestDTO(email, password);
         given(userRepository.findByEmail(email)).willReturn(user);
         given(passwordEncoder.matches(password, user.getPassword())).willReturn(true);
-        given(jwtUtils.createToken(any(Authentication.class))).willReturn("dummyToken");
+        given(jwtUtils.createAuthToken(any(Authentication.class))).willReturn("dummyToken");
 
         // when
         AuthResponseDTO responseDTO = userDetailService.loginUser(loginRequestDTO);
