@@ -67,6 +67,7 @@ public class BookService {
                 .map(BookMapper::toDto);
     }
 
+
     public void update(Long id, BookRequestDTO bookRequestDTO) {
         Book existingBook = bookRepository.findById(id).orElseThrow(() -> new BookNotFoundException("Book not found"));
         existingBook.setAuthor(bookRequestDTO.author());

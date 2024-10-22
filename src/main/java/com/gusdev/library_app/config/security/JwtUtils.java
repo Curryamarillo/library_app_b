@@ -6,8 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,7 +24,7 @@ public class JwtUtils {
     @Value("${security.jwt.user.generator}")
     private String userGenerator;
 
-    private static final int AUTH_TOKEN_EXPIRATION_TIME = 15 * 60 * 1000;
+    private static final int AUTH_TOKEN_EXPIRATION_TIME = 60 * 60 * 1000;
 
     private static final int REFRESH_TOKEN_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
 
@@ -52,14 +50,11 @@ public class JwtUtils {
     public String createRefreshToken(Authentication authentication) {
         Algorithm algorithm = Algorithm.HMAC256(this.privateKey);
         String username = authentication.getPrincipal().toString();
-        String authorities = authentication.getAuthorities()
-                .stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+
 
         return JWT.create()
                 .withIssuer(this.userGenerator)
                 .withSubject(username)
-                .withClaim("authorities", authorities)
                 .withClaim("type", "refreshToken")
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis()+ REFRESH_TOKEN_EXPIRATION_TIME))
@@ -76,11 +71,14 @@ public class JwtUtils {
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(this.userGenerator)
                     .build();
+            System.out.println("Validating token: " + token);
             return verifier.verify(token);
         } catch (JWTVerificationException exception) {
-            throw  new JWTVerificationException("Token Invalid, not authorized");
+            System.out.println("Token verification failed: " + exception.getMessage());
+            throw new JWTVerificationException("Token Invalid, not authorized: " + exception.getMessage());
         }
     }
+
     public boolean isRefreshToken(String token) {
         try {
             DecodedJWT decodedJWT = validateToken(token);

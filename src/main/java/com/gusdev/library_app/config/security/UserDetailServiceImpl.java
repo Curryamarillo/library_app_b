@@ -81,7 +81,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
         String accessToken = jwtUtils.createAuthToken(authentication);
         String refreshToken = jwtUtils.createRefreshToken(authentication);
         Boolean isAdmin = userRepository.findByEmail(username).getIsAdmin();
-            return new AuthResponseDTO(username, "User logged succesfully", true, isAdmin,  accessToken, refreshToken, true);
+            return new AuthResponseDTO(username, "User logged successfully", true, isAdmin,  accessToken, refreshToken, true);
         }
 
     public Authentication authenticate(String email, String password) {

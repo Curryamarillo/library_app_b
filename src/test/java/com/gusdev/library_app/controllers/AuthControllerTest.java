@@ -56,9 +56,22 @@ public class AuthControllerTest {
 
    @BeforeEach
    void setUp() {
-       userCreateRequestDTO = new UserCreateRequestDTO("UserOne", "UserSurnameOne", "email@email.com", true, "password123");
-       loginRequestDTO = new LoginRequestDTO("test@example.com", "password123");
-       authResponseDTO = new AuthResponseDTO("test@example.com", "", true, true, "", true);
+       userCreateRequestDTO = new UserCreateRequestDTO(
+               "UserOne",
+               "UserSurnameOne",
+               "email@email.com",
+               true,
+               "password123");
+       loginRequestDTO = new LoginRequestDTO(
+               "test@example.com",
+               "password123");
+       authResponseDTO = new AuthResponseDTO("test@example.com",
+               "User created Successfully",
+               true,
+               true,
+               "mocked-jwt-token",
+               "mocked-refresh-jwt",
+               true);
     }
 
     private String generateJwtToken() {

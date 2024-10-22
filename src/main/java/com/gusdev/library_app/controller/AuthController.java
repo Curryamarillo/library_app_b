@@ -41,6 +41,7 @@ public class AuthController {
     }
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(@RequestHeader("Authorization") String authorization){
+        System.out.println("Inside the Post Mapping Method Refresh Token");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Missing or invalid authorization header"));
         }

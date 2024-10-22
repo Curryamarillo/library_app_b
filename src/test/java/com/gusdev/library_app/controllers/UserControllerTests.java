@@ -3,6 +3,8 @@ package com.gusdev.library_app.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gusdev.library_app.config.security.JwtUtils;
 import com.gusdev.library_app.controller.UserController;
+import com.gusdev.library_app.dtoRequest.UserCreateRequestDTO;
+import com.gusdev.library_app.dtoRequest.UserUpdateRequestDTO;
 import com.gusdev.library_app.dtoResponse.UserResponseDTO;
 import com.gusdev.library_app.entities.Loan;
 import com.gusdev.library_app.entities.User;
@@ -55,6 +57,7 @@ public class UserControllerTests {
     private User user2;
     private UserResponseDTO userResponseDTO1;
     private UserResponseDTO userResponseDTO2;
+    private UserUpdateRequestDTO userUpdateRequestDTO;
 
     @BeforeEach
     void setUp() {
@@ -90,7 +93,7 @@ public class UserControllerTests {
     void createUser_Success() throws Exception {
         String token = generateJwtToken();
 
-        given(userService.create(any(User.class))).willReturn(user1);
+        given(userService.create(any(UserCreateRequestDTO.class))).willReturn(userResponseDTO1);
 
 
         ResultActions result = mockMvc.perform(post("/users/create")
@@ -194,7 +197,7 @@ public class UserControllerTests {
     void updateUser_Success() throws Exception {
         String token = generateJwtToken();
 
-        doNothing().when(userService).update(1L, user1);
+        doNothing().when(userService).update(1L, userUpdateRequestDTO);
         given(userService.findById(1L)).willReturn(userResponseDTO1);
 
         ResultActions result = mockMvc.perform(put("/users/{id}", 1L)
@@ -214,7 +217,7 @@ public class UserControllerTests {
     void updateUser_UserNotFound() throws Exception {
         String token = generateJwtToken();
 
-        doThrow(new UserNotFoundException("User not found")).when(userService).update(2L, user2);
+        doThrow(new UserNotFoundException("User not found")).when(userService).update(2L, userUpdateRequestDTO);
 
         ResultActions result = mockMvc.perform(put("/users/{id}", 2L)
                 .header("Authorization", token)
