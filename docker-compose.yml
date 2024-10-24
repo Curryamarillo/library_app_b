@@ -1,0 +1,36 @@
+
+services:
+  db:
+    ports:
+      - "5432:5432"
+    container_name: postgresql_container
+    image: postgres
+    environment:
+      - POSTGRES_DB=library_app_pu
+      - POSTGRES_PASSWORD=telmita2009
+      - POSTGRES_USER=gustavo
+    volumes:
+      - /c/Users/kaasl/Desktop/Spring/Teacher_app/db:/var/lib/postgresql/data
+
+    restart: always
+    networks:
+      - library_network
+
+  backend:
+    build: .
+    container_name: library_app_container
+    ports:
+      - "8080:8080"
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/library_app_pu
+      DB_USERNAME: gustavo
+      DB_PASSWORD: telmita2009
+    depends_on:
+      - db
+    restart: always
+    networks:
+      - library_network
+
+networks:
+  library_network:
+    driver: bridge
