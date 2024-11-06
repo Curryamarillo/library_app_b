@@ -25,12 +25,9 @@ public class UserController {
 
     private final UserService userService;
 
-    private final PasswordEncoder passwordEncoder;
-
     @Autowired
     public UserController(UserService userService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/create")
@@ -88,9 +85,7 @@ public class UserController {
     @PutMapping("/v2/update/{id}")
     public ResponseEntity<UserResponseDTO> updateUserV2(@PathVariable Long id, @RequestBody UserUpdateRequestDTO userUpdateRequestDTO) {
         try {
-            UserResponseDTO userToUpdate = userService.findById(id);
-            userService.update(id, userUpdateRequestDTO);
-            UserResponseDTO updatedUser = userService.findById(id);
+            UserResponseDTO updatedUser = userService.update(id, userUpdateRequestDTO);
             return ResponseEntity.ok(updatedUser);
         } catch (UserNotFoundException e) {
             return ResponseEntity.notFound().build();

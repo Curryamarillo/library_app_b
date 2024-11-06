@@ -39,7 +39,7 @@ public class User implements UserDetails {
     private String email;
 
     @Column(nullable = false)
-    private Boolean isAdmin;
+    private boolean isAdmin;
 
     @Column(nullable = false, length = 100)
     private String password;

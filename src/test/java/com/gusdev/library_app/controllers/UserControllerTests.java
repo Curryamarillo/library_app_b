@@ -21,6 +21,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @Import({UserController.class, UserService.class, JwtUtils.class})
 public class UserControllerTests {
 
@@ -66,7 +69,7 @@ public class UserControllerTests {
         user1.setName("User One");
         user1.setSurname("Surname One");
         user1.setEmail("emailOne@test.com");
-        user1.setIsAdmin(true);
+        user1.setAdmin(true);
         user1.setLoans(Set.of(new Loan()));
         user1.setPassword("password123");
 
@@ -76,7 +79,7 @@ public class UserControllerTests {
         user2.setName("User Two");
         user2.setSurname("Surname Two");
         user2.setEmail("emailTwo@test.com");
-        user2.setIsAdmin(false);
+        user2.setAdmin(false);
         user2.setLoans(Set.of(new Loan()));
         user2.setPassword("password456");
 
@@ -92,14 +95,14 @@ public class UserControllerTests {
     @Test
     void createUser_Success() throws Exception {
         String token = generateJwtToken();
-
-        given(userService.create(any(UserCreateRequestDTO.class))).willReturn(userResponseDTO1);
+        UserCreateRequestDTO userCreateRequestDTO = new UserCreateRequestDTO("User One", "Surname One", "emailOne@test.com", true, "password123");
+        given(userService.create(userCreateRequestDTO)).willReturn(userResponseDTO1);
 
 
         ResultActions result = mockMvc.perform(post("/users/create")
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userResponseDTO1)));
+                .content(objectMapper.writeValueAsString(userCreateRequestDTO)));
 
         result.andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -193,24 +196,29 @@ public class UserControllerTests {
         result.andExpect(status().isNotFound());
     }
 
+    @WithMockUser(roles = "USER_ADMIN")
     @Test
     void updateUser_Success() throws Exception {
         String token = generateJwtToken();
+    UserResponseDTO existingUser = new UserResponseDTO(1L, "oldName", "oldSurname", "oldEmail", false);
+    UserResponseDTO updatedUser = new UserResponseDTO(1L, "newName", "newSurname", "newEmail@mail.com", true);
 
-        doNothing().when(userService).update(1L, userUpdateRequestDTO);
-        given(userService.findById(1L)).willReturn(userResponseDTO1);
+    given(userService.findById(1L)).willReturn(existingUser);
+    given(userService.update(eq(1L), any(UserUpdateRequestDTO.class))).willReturn(updatedUser);
 
-        ResultActions result = mockMvc.perform(put("/users/{id}", 1L)
+        ResultActions result = mockMvc.perform(put("/users/v2/update/{id}", 1L)
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(userResponseDTO1)));
+                .content(objectMapper.writeValueAsString(new UserUpdateRequestDTO("newName", "newSurname", "newEmail@mail.com", true))));
 
+        // Verificaciones
         result.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(userResponseDTO1.id()))
-                .andExpect(jsonPath("$.name").value(userResponseDTO1.name()))
-                .andExpect(jsonPath("$.surname").value(userResponseDTO1.surname()))
-                .andExpect(jsonPath("$.email").value(userResponseDTO1.email()));
+                .andExpect(jsonPath("$.id").value(updatedUser.id()))
+                .andExpect(jsonPath("$.name").value(updatedUser.name()))
+                .andExpect(jsonPath("$.surname").value(updatedUser.surname()))
+                .andExpect(jsonPath("$.email").value(updatedUser.email()))
+                .andExpect(jsonPath("$.isAdmin").value(updatedUser.isAdmin()));
     }
 
     @Test
@@ -219,7 +227,7 @@ public class UserControllerTests {
 
         doThrow(new UserNotFoundException("User not found")).when(userService).update(2L, userUpdateRequestDTO);
 
-        ResultActions result = mockMvc.perform(put("/users/{id}", 2L)
+        ResultActions result = mockMvc.perform(put("/users/v2/update/{id}", 2L)
                 .header("Authorization", token)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userResponseDTO2)));

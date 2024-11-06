@@ -69,7 +69,7 @@ class UserServiceTest {
         user1.setName("John");
         user1.setSurname("Doe");
         user1.setEmail("john.doe@test.com");
-        user1.setIsAdmin(true);
+        user1.setAdmin(true);
         user1.setLoans(Set.of(new Loan()));
         user1.setPassword("passwordJohn");
 
@@ -79,7 +79,6 @@ class UserServiceTest {
         user2.setName("Jane");
         user2.setSurname("Doe");
         user2.setEmail("jane.doe@test.com");
-        user2.setIsAdmin(false);
         user2.setLoans(Set.of(new Loan()));
         user2.setPassword("passwordJane");
 
@@ -89,7 +88,6 @@ class UserServiceTest {
         user3.setName("Alex");
         user3.setSurname("Smith");
         user3.setEmail("alex.smith@test.com");
-        user3.setIsAdmin(true);
         user3.setLoans(Set.of());
         user3.setPassword("passwordAlex");
 
@@ -164,7 +162,6 @@ class UserServiceTest {
         newUser.setName(userCreateRequestDTO1.name());
         newUser.setSurname(userCreateRequestDTO1.surname());
         newUser.setEmail(userCreateRequestDTO1.email());
-        newUser.setIsAdmin(userCreateRequestDTO1.isAdmin());
         newUser.setPassword(passwordEncoder.encode(userCreateRequestDTO1.password()));
         newUser.setLoans(Set.of());
 
@@ -353,7 +350,7 @@ class UserServiceTest {
 
         String result = userService.updatePassword(1L,"oldPassword", "newPassword");
 
-       assertEquals("oldPassword", result);
+       assertEquals("Password updated successfully, login again", result);
        assertEquals("newEncodedPassword", user1.getPassword());
        verify(userRepository).save(user1);
     }

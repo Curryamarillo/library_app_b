@@ -13,7 +13,7 @@ public class UserMapper {
                 user.getName(),
                 user.getSurname(),
                 user.getEmail(),
-                user.getIsAdmin());
+                user.isAdmin());
     }
     public static List<UserResponseDTO> toDTOList(List<User> usersList) {
         return usersList.stream()

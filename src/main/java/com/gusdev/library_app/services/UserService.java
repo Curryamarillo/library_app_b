@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -50,11 +51,11 @@ public class UserService {
         newUser.setEmail(userCreateRequestDTO.email());
         String encodedPassword = passwordEncoder.encode(userCreateRequestDTO.password());
         newUser.setPassword(encodedPassword);
-        newUser.setIsAdmin(userCreateRequestDTO.isAdmin());
+        newUser.setAdmin(userCreateRequestDTO.isAdmin());
         userRepository.save(newUser);
 
         User user = userRepository.findByEmail(newUser.getEmail());
-        return new UserResponseDTO(user.getId(), user.getName(),user.getSurname(),user.getEmail(),user.getIsAdmin());
+        return new UserResponseDTO(user.getId(), user.getName(),user.getSurname(),user.getEmail(),user.isAdmin());
     }
 
 
@@ -83,7 +84,7 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User with id: " + id + " not found"));
     }
 
-    public void update(Long id, UserUpdateRequestDTO dto) {
+    public UserResponseDTO update(Long id, UserUpdateRequestDTO dto) {
         User existsUser = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with ID " + id + " not found"));
         System.out.println("DTO received: " + dto.getClass().getName());
@@ -91,8 +92,10 @@ public class UserService {
         existsUser.setName(dto.name());
         existsUser.setSurname(dto.surname());
         existsUser.setEmail(dto.email());
-        existsUser.setIsAdmin(dto.isAdmin());
+        existsUser.setAdmin(dto.isAdmin());
         userRepository.save(existsUser);
+
+        return new UserResponseDTO(existsUser.getId(), existsUser.getName(), existsUser.getSurname(), existsUser.getEmail(), existsUser.isAdmin());
     }
 
     public String updatePassword(Long id, String oldPassword, String newPassword) {
@@ -107,7 +110,7 @@ public class UserService {
         } else {
             throw new InvalidPasswordException("Old password does not match");
         }
-        return oldPasswordInDb;
+        return "Password updated successfully, login again";
     }
 
 

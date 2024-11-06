@@ -24,7 +24,6 @@ class UserMapperTest {
         user1.setName("User One");
         user1.setSurname("Surname One");
         user1.setEmail("emailOne@test.com");
-        user1.setIsAdmin(true);
         user1.setLoans(Set.of(new Loan()));
         user1.setPassword("password123");
 
@@ -33,7 +32,6 @@ class UserMapperTest {
         user2.setName("User Two");
         user2.setSurname("Surname Two");
         user2.setEmail("emailTwo@test.com");
-        user2.setIsAdmin(false);
         user2.setLoans(Set.of(new Loan()));
         user2.setPassword("password456");
     }
@@ -47,7 +45,7 @@ class UserMapperTest {
         assertEquals(user1.getId(), userResponseDTO.id());
         assertEquals(user1.getName(), userResponseDTO.name());
         assertEquals(user1.getSurname(), userResponseDTO.surname());
-        assertEquals(user1.getIsAdmin(), userResponseDTO.isAdmin());
+        assertEquals(user1.isAdmin(), userResponseDTO.isAdmin());
 
     }
 
@@ -68,13 +66,13 @@ class UserMapperTest {
         assertEquals(user1.getName(), dto1.name());
         assertEquals(user1.getSurname(), dto1.surname());
         assertEquals(user1.getEmail(), dto1.email());
-        assertEquals(user1.getIsAdmin(), dto1.isAdmin());
+        assertEquals(user1.isAdmin(), dto1.isAdmin());
 
         UserResponseDTO dto2 = userResponseDTOList.get(1);
         assertEquals(user2.getId(), dto2.id());
         assertEquals(user2.getName(), dto2.name());
         assertEquals(user2.getSurname(), dto2.surname());
         assertEquals(user2.getEmail(), dto2.email());
-        assertEquals(user2.getIsAdmin(), dto2.isAdmin());
+        assertEquals(user2.isAdmin(), dto2.isAdmin());
     }
 }

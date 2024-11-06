@@ -47,18 +47,11 @@ public class UserDetailServiceImpl implements UserDetailsService {
         String password = createUserRequest.password();
         Boolean isAdmin = createUserRequest.isAdmin();
 
-        System.out.println(email);
-        System.out.println(name);
-        System.out.println(surname);
-        System.out.println(password);
-        System.out.println(isAdmin);
-
-
         User userEntity = User.builder().email(email).name(name).surname(surname).password(passwordEncoder.encode(password)).isAdmin(isAdmin).build();
         User userSaved = userRepository.save(userEntity);
 
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
-        if (userSaved.getIsAdmin()) {
+        if (userSaved.isAdmin()) {
 
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else {
@@ -80,7 +73,7 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
         String accessToken = jwtUtils.createAuthToken(authentication);
         String refreshToken = jwtUtils.createRefreshToken(authentication);
-        Boolean isAdmin = userRepository.findByEmail(username).getIsAdmin();
+        Boolean isAdmin = userRepository.findByEmail(username).isAdmin();
             return new AuthResponseDTO(username, "User logged successfully", true, isAdmin,  accessToken, refreshToken, true);
         }
 

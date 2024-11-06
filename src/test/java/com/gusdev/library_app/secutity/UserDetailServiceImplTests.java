@@ -104,7 +104,7 @@ public class UserDetailServiceImplTests {
         // then
         assertNotNull(responseDTO);
         assertEquals(email, responseDTO.email());
-        assertEquals("User logged succesfully", responseDTO.message());
+        assertEquals("User logged successfully", responseDTO.message());
         assertEquals(true, responseDTO.isAdmin());
     }
 

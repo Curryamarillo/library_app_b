@@ -71,7 +71,6 @@ public class JwtUtils {
             JWTVerifier verifier = JWT.require(algorithm)
                     .withIssuer(this.userGenerator)
                     .build();
-            System.out.println("Validating token: " + token);
             return verifier.verify(token);
         } catch (JWTVerificationException exception) {
             System.out.println("Token verification failed: " + exception.getMessage());
